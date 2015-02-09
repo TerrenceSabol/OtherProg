@@ -1,0 +1,6 @@
+\\ncfs1\home\OIT\Terry.Sabol\Visual Studio 2010\Projects\studyhallCheckin2\studyhallCheckin\obj\x86\Debug\studyhallCheckin.exe
+\\ncfs1\home\OIT\Terry.Sabol\Visual Studio 2010\Projects\studyhallCheckin2\studyhallCheckin\obj\x86\Debug\studyhallCheckin.xml
+\\ncfs1\home\OIT\Terry.Sabol\Visual Studio 2010\Projects\studyhallCheckin2\studyhallCheckin\obj\x86\Debug\studyhallCheckin.pdb
+E:\studyhallCheckin2\studyhallCheckin\obj\x86\Debug\studyhallCheckin.exe
+E:\studyhallCheckin2\studyhallCheckin\obj\x86\Debug\studyhallCheckin.xml
+E:\studyhallCheckin2\studyhallCheckin\obj\x86\Debug\studyhallCheckin.pdb
