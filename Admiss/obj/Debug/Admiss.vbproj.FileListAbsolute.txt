@@ -1,0 +1,17 @@
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\bin\Debug\Admiss.exe.config
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\Admiss.exe
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\Admiss.xml
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\Admiss.pdb
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\bin\Debug\Admiss.exe.manifest
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\bin\Debug\Admiss.application
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\bin\Debug\Admiss.exe
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\bin\Debug\Admiss.pdb
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\bin\Debug\Admiss.xml
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\WindowsApplication1.frmAdmiss.resources
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\WindowsApplication1.frmStages.resources
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\WindowsApplication1.frmOnlineReport.resources
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\WindowsApplication1.frmSSRS.resources
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\WindowsApplication1.Resources.resources
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\Admiss.vbproj.GenerateResource.Cache
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\Admiss.exe.manifest
+C:\Users\John.James\Desktop\Projects\vb.net_applications\Admiss\Admiss\obj\Debug\Admiss.application
