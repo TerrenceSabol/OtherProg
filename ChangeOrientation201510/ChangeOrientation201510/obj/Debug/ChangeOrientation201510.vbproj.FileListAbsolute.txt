@@ -1,0 +1,20 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\bin\Debug\ChangeOrientation201510.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ChangeOrientation201510\ChangeOrientation201510\obj\Debug\ChangeOrientation201510.vbproj.GenerateResource.Cache
