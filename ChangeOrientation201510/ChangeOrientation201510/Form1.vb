@@ -212,7 +212,7 @@ Imports System.Data.SqlClient
             Button1.Enabled = True
             Label6.Text = " to " & ListBox1.SelectedItem.ToString
             If ListBox1.SelectedItem.ToString = "June 26" Then
-                theto = "2015-06-27"
+            theto = "2015-06-26"
                 thesess = "Jun 26 20"
             End If
             If ListBox1.SelectedItem.ToString = "July 24" Then
