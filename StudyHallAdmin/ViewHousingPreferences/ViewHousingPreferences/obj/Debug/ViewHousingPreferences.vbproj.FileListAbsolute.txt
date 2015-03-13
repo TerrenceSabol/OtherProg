@@ -1,0 +1,20 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\bin\Debug\ViewHousingPreferences.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ViewHousingPreferences\ViewHousingPreferences\obj\Debug\ViewHousingPreferences.vbproj.GenerateResource.Cache
