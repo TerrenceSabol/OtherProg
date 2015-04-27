@@ -1,0 +1,20 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\bin\Debug\ControlInfo1.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\obj\Debug\SportsRoster.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\obj\Debug\SportsRoster.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\obj\Debug\SportsRoster.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\bin\Debug\ControlInfo1.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\bin\Debug\ControlInfo1.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\bin\Debug\ControlInfo1.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\obj\Debug\ControlInfo1.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\obj\Debug\ControlInfo1.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SportsRoster\obj\Debug\ControlInfo1.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\bin\Debug\SportsRoster.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\bin\Debug\SportsRoster.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\bin\Debug\SportsRoster.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\bin\Debug\SportsRoster.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\obj\Debug\SportsRoster.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\obj\Debug\SportsRoster.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\obj\Debug\SportsRoster.vbproj.GenerateResource.Cache
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\obj\Debug\SportsRoster.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\obj\Debug\SportsRoster.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SportsRoster\SportsRoster\obj\Debug\SportsRoster.pdb

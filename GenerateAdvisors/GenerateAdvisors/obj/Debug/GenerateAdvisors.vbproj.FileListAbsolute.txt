@@ -1,0 +1,11 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\GenerateAdvisors\bin\Debug\GenerateAdvisors.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\bin\Debug\GenerateAdvisors.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\obj\Debug\GenerateAdvisors.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\obj\Debug\GenerateAdvisors.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\obj\Debug\GenerateAdvisors.vbproj.GenerateResource.Cache
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\bin\Debug\GenerateAdvisors.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\bin\Debug\GenerateAdvisors.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\bin\Debug\GenerateAdvisors.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\obj\Debug\GenerateAdvisors.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\obj\Debug\GenerateAdvisors.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateAdvisors\GenerateAdvisors\obj\Debug\GenerateAdvisors.pdb

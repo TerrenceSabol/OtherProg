@@ -1,0 +1,20 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\bin\Debug\ControlInfo1.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\bin\Debug\ControlInfo1.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\bin\Debug\ControlInfo1.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\bin\Debug\ControlInfo1.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\obj\Debug\ControlInfo1.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\obj\Debug\ControlInfo1.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\Production_Controlinfo_Maint\obj\Debug\ControlInfo1.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\bin\Debug\Production_Controlinfo_Maint.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\bin\Debug\Production_Controlinfo_Maint.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\bin\Debug\Production_Controlinfo_Maint.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\bin\Debug\Production_Controlinfo_Maint.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.vbproj.GenerateResource.Cache
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\Production_Controlinfo_Maint\Production_Controlinfo_Maint\obj\Debug\Production_Controlinfo_Maint.pdb

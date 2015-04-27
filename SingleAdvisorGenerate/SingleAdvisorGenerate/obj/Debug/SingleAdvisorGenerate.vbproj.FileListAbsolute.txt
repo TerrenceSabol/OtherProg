@@ -1,0 +1,14 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\bin\Debug\SingleAdvisorGenerate.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\bin\Debug\SingleAdvisorGenerate.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\bin\Debug\SingleAdvisorGenerate.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\bin\Debug\SingleAdvisorGenerate.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SingleAdvisorGenerate\SingleAdvisorGenerate\bin\Debug\SingleAdvisorGenerate.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SingleAdvisorGenerate\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SingleAdvisorGenerate\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\SingleAdvisorGenerate\SingleAdvisorGenerate\obj\Debug\SingleAdvisorGenerate.pdb

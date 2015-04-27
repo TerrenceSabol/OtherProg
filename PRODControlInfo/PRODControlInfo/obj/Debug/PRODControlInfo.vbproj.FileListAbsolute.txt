@@ -1,0 +1,2 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\PRODControlInfo\bin\Debug\PRODControlInfo.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\PRODControlInfo\PRODControlInfo\bin\Debug\PRODControlInfo.exe.config

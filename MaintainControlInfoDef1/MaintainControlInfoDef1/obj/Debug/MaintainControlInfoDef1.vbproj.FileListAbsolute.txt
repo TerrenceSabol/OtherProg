@@ -1,0 +1,10 @@
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\bin\Debug\MaintainControlInfoDef1.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\bin\Debug\MaintainControlInfoDef1.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\bin\Debug\MaintainControlInfoDef1.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\bin\Debug\MaintainControlInfoDef1.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\obj\Debug\MaintainControlInfoDef.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\obj\Debug\MaintainControlInfoDef.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\obj\Debug\MaintainControlInfoDef1.vbproj.GenerateResource.Cache
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\obj\Debug\MaintainControlInfoDef1.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\obj\Debug\MaintainControlInfoDef1.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\MaintainControlInfoDef1\MaintainControlInfoDef1\obj\Debug\MaintainControlInfoDef1.pdb

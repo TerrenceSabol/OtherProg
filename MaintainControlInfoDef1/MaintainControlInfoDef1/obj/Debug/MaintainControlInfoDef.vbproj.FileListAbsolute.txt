@@ -1,0 +1,10 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\bin\Debug\ControlInfo1.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\obj\Debug\MaintainControlInfoDef.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\obj\Debug\MaintainControlInfoDef.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\obj\Debug\MaintainControlInfoDef.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\bin\Debug\ControlInfo1.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\bin\Debug\ControlInfo1.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\bin\Debug\ControlInfo1.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\obj\Debug\ControlInfo1.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\obj\Debug\ControlInfo1.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\MaintainControlInfoDef\obj\Debug\ControlInfo1.pdb
