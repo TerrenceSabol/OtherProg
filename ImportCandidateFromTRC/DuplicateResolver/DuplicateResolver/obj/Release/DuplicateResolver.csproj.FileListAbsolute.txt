@@ -1,0 +1,8 @@
+C:\dev\DuplicateResolver\DuplicateResolver\bin\Release\DuplicateResolver.exe.config
+C:\dev\DuplicateResolver\DuplicateResolver\bin\Release\DuplicateResolver.exe
+C:\dev\DuplicateResolver\DuplicateResolver\bin\Release\DuplicateResolver.pdb
+C:\dev\DuplicateResolver\DuplicateResolver\obj\Release\DuplicateResolver.Form1.resources
+C:\dev\DuplicateResolver\DuplicateResolver\obj\Release\DuplicateResolver.Properties.Resources.resources
+C:\dev\DuplicateResolver\DuplicateResolver\obj\Release\DuplicateResolver.csproj.GenerateResource.Cache
+C:\dev\DuplicateResolver\DuplicateResolver\obj\Release\DuplicateResolver.exe
+C:\dev\DuplicateResolver\DuplicateResolver\obj\Release\DuplicateResolver.pdb

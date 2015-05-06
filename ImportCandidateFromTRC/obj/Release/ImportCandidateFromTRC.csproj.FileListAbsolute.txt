@@ -1,0 +1,8 @@
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\bin\Release\ImportCandidateFromTRC.exe.config
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\bin\Release\ImportCandidateFromTRC.exe
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\bin\Release\ImportCandidateFromTRC.pdb
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\obj\Release\ImportCandidateFromTRC.Form1.resources
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\obj\Release\ImportCandidateFromTRC.Properties.Resources.resources
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\obj\Release\ImportCandidateFromTRC.csproj.GenerateResource.Cache
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\obj\Release\ImportCandidateFromTRC.exe
+C:\dev\ImportCandidateFromTRC\ImportCandidateFromTRC\ImportCandidateFromTRC\obj\Release\ImportCandidateFromTRC.pdb

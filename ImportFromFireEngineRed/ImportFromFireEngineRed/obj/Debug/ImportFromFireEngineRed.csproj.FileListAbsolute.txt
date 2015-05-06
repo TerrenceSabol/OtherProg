@@ -1,0 +1,12 @@
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Debug\ImportFromFireEngineRed.exe.config
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.csprojResolveAssemblyReference.cache
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.Properties.Resources.resources
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.csproj.GenerateResource.Cache
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.Form1.resources
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Debug\ImportFromFireEngineRed.exe
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Debug\ImportFromFireEngineRed.pdb
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.exe
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.pdb
+E:\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Debug\ImportFromFireEngineRed.exe.config
+E:\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.exe
+E:\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Debug\ImportFromFireEngineRed.pdb

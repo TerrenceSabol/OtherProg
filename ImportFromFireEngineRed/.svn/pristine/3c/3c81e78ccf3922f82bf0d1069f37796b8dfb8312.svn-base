@@ -1,0 +1,137 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ImportFromFireEngineRed
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            lblVersion.Text = "Version: " + Application.ProductVersion;
+            
+            btnImport.Enabled = false;
+            progressBar1.Visible = false;
+            progressBar1.Left = btnImport.Left;
+            progressBar1.Top = btnImport.Top;
+            progressBar1.Width = btnImport.Width;
+            progressBar1.Height = btnImport.Height;
+
+            WriteLog("--------");
+            WriteLog("Import from Fire Engine Red Tool Initialized.", true);
+            WriteLog("Tool version: " + Application.ProductVersion);
+            WriteLog("Running under username: " + Environment.UserName);
+        }
+
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
+            openFileDialog1.Multiselect = false;
+            openFileDialog1.FileName = "";
+            openFileDialog1.ShowDialog();
+            if (openFileDialog1.FileName == "")
+            {
+                //do nothing
+            }
+            else
+            {
+                txtFileLoc.Text = openFileDialog1.FileName;
+                btnImport.Enabled = true;
+                WriteLog("User selected " + txtFileLoc.Text);
+            }
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            btnImport.Text = "Please Wait...";
+            btnImport.Enabled = false;
+            
+            WriteLog("Checking CSV Headers...", true);
+            if (Program.CheckFirstLine(txtFileLoc.Text))
+            {
+                WriteLog("CSV Headers okay.", true);
+            }
+            else
+            {
+                WriteLog("CSV Headers incorrect! Cannot continue.", true);
+                btnImport.Text = "Import";
+                //don't want to re-enable button because obviously this csv is garbage
+                return;
+            }
+
+            List<string[]> parsedFile = Program.parseCSV(txtFileLoc.Text);
+
+            int numberOfProspects = parsedFile.Count - 1; //minus one because the first line is the header
+
+            WriteLog("Found " + numberOfProspects.ToString() + " prospects.", true);
+            Program.MessyRest(300);
+
+            //show progressbar instead of button
+            progressBar1.Visible = true;
+            btnImport.Visible = false;
+
+            progressBar1.Maximum = numberOfProspects;
+            
+
+            for (int i = 1; i <= numberOfProspects; i++) //start at one because the first(0) line is headers
+            {
+                progressBar1.Value = i;
+
+                WriteLog("Parsing " + i.Ordinal() + " prospect (CSV row " + (i + 1) + ")", true);
+                //ParseLine(parsedFile, i);
+
+                Program.MessyRest(200);
+            }
+
+            //show button instead of progressbar
+            progressBar1.Visible = false;
+            btnImport.Visible = true;
+
+            WriteLog("Finished!", true);
+            btnImport.Text = "Import";
+            //don't want to re-enable button because don't want someone running same csv twice at once
+        }
+
+
+        /// <summary>
+        /// Writes to the file log
+        /// </summary>
+        /// <param name="LogText">Text to log</param>
+        /// <param name="ShowInUserLog">Optional. If true, writes log to textbox also. Default = false.</param>
+        private void WriteLog(string LogText, Boolean ShowInUserLog = false)
+        {
+            try
+            {
+                string strFileName = System.AppDomain.CurrentDomain.FriendlyName + ".log.txt";
+                using (StreamWriter w = File.AppendText(strFileName))
+                {
+                    w.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " - " + LogText);
+                }
+
+                if (ShowInUserLog)
+                {
+                    txtLog.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " - " + LogText + "\n\n");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Error! Unable to write to log file. This tool will now exit.");
+                Program.CommitSuicide();
+            }
+        }
+
+
+    }
+}

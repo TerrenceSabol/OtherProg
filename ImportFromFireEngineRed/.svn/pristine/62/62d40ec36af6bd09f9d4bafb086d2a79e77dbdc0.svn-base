@@ -1,0 +1,877 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ImportFromFireEngineRed
+{
+    public partial class Form1 : Form
+    {
+        List<int> ErroneousRows = new List<int>();
+        
+        public Form1()
+        {
+            InitializeComponent(); 
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            lblVersion.Text = "Version: " + Application.ProductVersion;
+            lblServer.Text = "Running on " + Program.DatabaseHostname;
+            
+            btnImport.Enabled = false;
+            progressBar1.Visible = false;
+            progressBar1.Left = btnImport.Left;
+            progressBar1.Top = btnImport.Top;
+            progressBar1.Width = btnImport.Width;
+            progressBar1.Height = btnImport.Height;
+
+            WriteLog("--------");
+            WriteLog("Import from Fire Engine Red Tool Initialized.", true);
+            WriteLog("Tool version: " + Application.ProductVersion);
+            WriteLog("Running under username: " + Environment.UserName);
+        }
+
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
+            openFileDialog1.Multiselect = false;
+            openFileDialog1.FileName = "";
+            openFileDialog1.ShowDialog();
+            if (openFileDialog1.FileName == "")
+            {
+                //do nothing
+            }
+            else
+            {
+                txtFileLoc.Text = openFileDialog1.FileName;
+                btnImport.Enabled = true;
+                WriteLog("User selected " + txtFileLoc.Text);
+            }
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            btnImport.Text = "Please Wait...";
+            btnImport.Enabled = false;
+            
+            WriteLog("Checking CSV Headers...", true);
+            if (Program.CheckFirstLine(txtFileLoc.Text))
+            {
+                WriteLog("CSV Headers okay.", true);
+            }
+            else
+            {
+                WriteLog("CSV Headers incorrect! Cannot continue.", true);
+                btnImport.Text = "Import";
+                //don't want to re-enable button because obviously this csv is garbage
+                return;
+            }
+
+            //Reset errors list
+            ErroneousRows.Clear();
+
+            List<string[]> parsedFile = Program.parseCSV(txtFileLoc.Text);
+
+            int numberOfApplicants = parsedFile.Count - 1; //minus one because the first line is the header
+
+            WriteLog("Found " + numberOfApplicants.ToString() + " applicants.", true);
+            Program.MessyRest(300);
+
+            //show progressbar instead of button
+            progressBar1.Visible = true;
+            btnImport.Visible = false;
+
+            progressBar1.Maximum = numberOfApplicants;
+            
+
+            for (int i = 1; i <= numberOfApplicants; i++) //start at one because the first(0) line is headers
+            {
+                progressBar1.Value = i;
+
+                WriteLog("Parsing " + i.Ordinal() + " applicant (CSV row " + (i + 1) + ")", true);
+                ParseLine(parsedFile, i);
+
+                Program.MessyRest(200);
+            }
+
+            //Done Parsing.
+            if (ErroneousRows.Count() > 0)
+            {
+                //Then we had some errors
+                MessageBox.Show("The CSV File had some erroneous rows. Those rows will now be exported to an errors.csv file. Please fix those rows.");
+                //TODO: this
+            }
+
+            //show button instead of progressbar
+            progressBar1.Visible = false;
+            btnImport.Visible = true;
+
+            WriteLog("Finished!", true);
+            btnImport.Text = "Import";
+            //don't want to re-enable button because don't want someone running same csv twice at once
+        }
+
+
+
+
+        private void ParseLine(List<string[]> parsedFile, int whichLine)
+        {
+            try
+            {
+                string strJenzIDNum;
+                string[] thisLine = parsedFile[whichLine];
+                
+                WriteLog("Getting next available Jenzabar ID Number...");
+                strJenzIDNum = Program.GetNextSeqNumber();
+                
+                #region NAME_MASTER
+                WriteLog("Generating NAME_MASTER query...");
+                string sqlInsertName = "INSERT INTO [dbo].[NC_HOLDING_NAME_MASTER] (";
+                sqlInsertName += "[ID_NUM], ";
+                sqlInsertName += "[LAST_NAME], ";
+                sqlInsertName += "[FIRST_NAME], ";
+                sqlInsertName += "[MIDDLE_NAME], ";
+                sqlInsertName += "[SUFFIX], ";
+                sqlInsertName += "[PREFERRED_NAME], ";
+                sqlInsertName += "[BIRTH_NAME], ";
+                sqlInsertName += "[MOBILE_PHONE], ";
+                sqlInsertName += "[EMAIL_ADDRESS], ";
+                sqlInsertName += "[USER_NAME], ";
+                sqlInsertName += "[JOB_NAME], ";
+                sqlInsertName += "[JOB_TIME]"; 
+                sqlInsertName += ") VALUES (";
+                //ID_NUM
+                sqlInsertName += strJenzIDNum.QuoteOrNull() + ", ";
+                //LAST_NAME
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("Last Name")].RemoveAllQuotes().GetFirst(30).QuoteOrNull() + ", ";
+                //FIRST_NAME
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("First Name")].RemoveAllQuotes().GetFirst(15).QuoteOrNull() + ", ";
+                //MIDDLE_NAME
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("Middle Name")].RemoveAllQuotes().GetFirst(15).QuoteOrNull() + ", ";
+                //SUFFIX
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("Suffix")].RemoveAllQuotes().GetFirst(3).QuoteOrNull() + ", ";
+                //PREFERRED_NAME
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("Preferred Name / Nickname")].RemoveAllQuotes().GetFirst(30).QuoteOrNull() + ", ";
+                //BIRTH_NAME
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("Former Last Name")].RemoveAllQuotes().GetFirst(30).QuoteOrNull() + ", ";
+                //MOBILE_PHONE
+                sqlInsertName += Program.WhicheverHasContent(thisLine[Program.GetColumnIndexOf("Cell Phone")],thisLine[Program.GetColumnIndexOf("Mobile_Phone_Intl")]).GetFirst(15).RemoveAllQuotes().RemoveNonAlphanumeric().QuoteOrNull() + ", ";
+                //EMAIL_ADDRESS
+                sqlInsertName += thisLine[Program.GetColumnIndexOf("Email Address")].RemoveAllQuotes().GetFirst(60).QuoteOrNull() + ", ";
+                //USER_NAME NOTE: For some reason this column only has 15 avail
+                sqlInsertName += Program.GetJobUsername().GetFirst(15).QuoteOrNull() + ", ";
+                //JOB_NAME
+                sqlInsertName += Program.JobName.QuoteOrNull() + ", ";
+                //JOB_TIME
+                sqlInsertName += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+                #endregion
+
+                #region ADDRESS_MASTER
+                WriteLog("Generating ADDRESS_MASTER query...");
+                string sqlInsertAddress = "INSERT INTO [dbo].[NC_HOLDING_ADDRESS_MASTER] (";
+                sqlInsertAddress += "[ID_NUM], ";
+                sqlInsertAddress += "[ADDR_CDE], ";
+                sqlInsertAddress += "[ADDR_LINE_1], ";
+                sqlInsertAddress += "[ADDR_LINE_2], ";
+                sqlInsertAddress += "[CITY], ";
+                sqlInsertAddress += "[STATE], ";
+                sqlInsertAddress += "[ZIP], ";
+                sqlInsertAddress += "[COUNTY], ";
+                sqlInsertAddress += "[COUNTRY], ";
+                sqlInsertAddress += "[PHONE], ";
+                sqlInsertAddress += "[USER_NAME], ";
+                sqlInsertAddress += "[JOB_NAME], ";
+                sqlInsertAddress += "[JOB_TIME] ";
+                sqlInsertAddress += ") VALUES (";
+                //ID_NUM
+                sqlInsertAddress += strJenzIDNum.QuoteOrNull() + ", ";
+                //ADDR_CDE
+                sqlInsertAddress += "*LHP".QuoteOrNull() + ", "; // *LHP = where they live
+                //ADDR_LINE_1
+                sqlInsertAddress += thisLine[Program.GetColumnIndexOf("Permanent Address_Address 1")].RemoveAllQuotes().GetFirst(60).QuoteOrNull() + ", ";
+                //ADDR_LINE_2
+                sqlInsertAddress += thisLine[Program.GetColumnIndexOf("Permanent Address_Address 2")].RemoveAllQuotes().GetFirst(60).QuoteOrNull() + ", ";
+                //CITY
+                sqlInsertAddress += thisLine[Program.GetColumnIndexOf("Permanent Address_City")].RemoveAllQuotes().GetFirst(25).QuoteOrNull() + ", ";
+                //STATE
+                sqlInsertAddress += thisLine[Program.GetColumnIndexOf("Permanent Address_State")].RemoveAllQuotes().GetFirst(2).QuoteOrNull() + ", ";
+                //ZIP
+                sqlInsertAddress += Program.WhicheverHasContent(thisLine[Program.GetColumnIndexOf("Permanent Address_ZIP")],thisLine[Program.GetColumnIndexOf("Permanent Address_ZIP_Intl")]).RemoveAllQuotes().GetFirst(12).QuoteOrNull() + ", ";
+                //COUNTY
+                sqlInsertAddress += thisLine[Program.GetColumnIndexOf("Permanent Address_County")].RemoveAllQuotes().GetFirst(5).QuoteOrNull() + ", ";
+                //COUNTRY
+                sqlInsertAddress += thisLine[Program.GetColumnIndexOf("Permanent Address_Country")].RemoveAllQuotes().GetFirst(3).QuoteOrNull() + ", ";
+                //PHONE
+                sqlInsertAddress += Program.WhicheverHasContent(thisLine[Program.GetColumnIndexOf("Home Phone")], thisLine[Program.GetColumnIndexOf("Home_Phone_Intl")]).RemoveAllQuotes().RemoveNonAlphanumeric().GetFirst(15).QuoteOrNull() + ", ";
+                //USER_NAME
+                sqlInsertAddress += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                //JOB_NAME
+                sqlInsertAddress += Program.JobName.QuoteOrNull() + ", ";
+                //JOB_TIME
+                sqlInsertAddress += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+                #endregion
+
+                #region BIOGRAPH_MASTER
+                WriteLog("Generating BIOGRAPH_MASTER query...");
+                string sqlInsertBiograph = "INSERT INTO [dbo].[NC_HOLDING_BIOGRAPH_MASTER] (";
+                sqlInsertBiograph += "[ID_NUM], ";
+                sqlInsertBiograph += "[GENDER], ";
+                sqlInsertBiograph += "[SSN], ";
+                sqlInsertBiograph += "[BIRTH_DTE], ";
+                sqlInsertBiograph += "[ETHNIC_GROUP], ";
+                sqlInsertBiograph += "[MARITAL_STS], ";
+                sqlInsertBiograph += "[RELIGION], ";
+                sqlInsertBiograph += "[CITIZEN_OF], ";
+                sqlInsertBiograph += "[VETERAN], ";
+                sqlInsertBiograph += "[VETERAN_OF_ARMED_SVCS_BRANCH], ";
+                sqlInsertBiograph += "[IS_ACTIVE_DUTY_ARMED_SVCS], ";
+                sqlInsertBiograph += "[ACTIVE_DUTY_ARMED_SVCS_BRANCH], ";
+                sqlInsertBiograph += "[USER_NAME], ";
+                sqlInsertBiograph += "[JOB_NAME], ";
+                sqlInsertBiograph += "[JOB_TIME] ";
+                sqlInsertBiograph += ") VALUES (";
+                //ID_NUM
+                sqlInsertBiograph += strJenzIDNum.QuoteOrNull() + ", ";
+                //GENDER
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Gender")].RemoveAllQuotes().GetFirst(1).QuoteOrNull() + ", ";
+                //SSN
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("SSN")].RemoveAllQuotes().RemoveNonAlphanumeric().GetFirst(10).QuoteOrNull() + ", ";
+                //BIRTH_DTE
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("DOB")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                //ETHNIC_GROUP
+                string strEthnic = DetermineEthnicGroup(
+                    thisLine[Program.GetColumnIndexOf("Hispanic/Latino Status")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (American Indian or Alaska Native (including all Original Peoples of the Americas))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (Asian (including Indian subcontinent and Phillippines))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (Black of African American (including Africa and Caribbean))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (Native Hawaiian or Other Pacific Islander (Original Peoples))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (White (including Middle Eastern))")].RemoveAllQuotes());
+
+                sqlInsertBiograph += strEthnic.QuoteOrNull() + ", ";
+
+                //MARITAL_STS
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Marital Status")].RemoveAllQuotes().GetFirst(1).QuoteOrNull() + ", ";
+                //RELIGION
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Religious Preference")].RemoveAllQuotes().GetFirst(4).QuoteOrNull() + ", ";
+                //CITIZEN_OF
+                if (thisLine[Program.GetColumnIndexOf("Citizenship Status")].RemoveAllQuotes() == "Citizen of US")
+                {
+                    sqlInsertBiograph += "US".QuoteOrNull() + ", ";
+                }
+                else
+                {
+                    sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Citizenship Country")].RemoveAllQuotes().GetFirst(3).QuoteOrNull() + ", ";
+                }
+                
+                //VETERAN
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Military_Veteran")].RemoveAllQuotes().GetFirst(1).DefaultTo("N").QuoteOrNull() + ", ";
+                //VETERAN_OF_ARMED_SVCS_BRANCH
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Military_Veteran Branch")].RemoveAllQuotes().GetFirst(6).QuoteOrNull() + ", ";
+                //IS_ACTIVE_DUTY_ARMED_SVCS
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Military_Active Duty")].RemoveAllQuotes().GetFirst(1).DefaultTo("N").QuoteOrNull() + ", ";
+                //ACTIVE_DUTY_ARMED_SVCS_BRANCH
+                sqlInsertBiograph += thisLine[Program.GetColumnIndexOf("Military_Active Branch")].RemoveAllQuotes().GetFirst(6).QuoteOrNull() + ", ";
+                //USER_NAME
+                sqlInsertBiograph += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                //JOB_NAME
+                sqlInsertBiograph += Program.JobName.QuoteOrNull() + ", ";
+                //JOB_TIME
+                sqlInsertBiograph += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+                #endregion
+
+                #region CANDIDATE
+                WriteLog("Generating CANDIDATE query...");
+                string sqlInsertCandidate = "INSERT INTO [dbo].[NC_HOLDING_CANDIDATE] (";
+                sqlInsertCandidate += "[ID_NUM], ";
+                sqlInsertCandidate += "[SOURCE_5], ";
+                sqlInsertCandidate += "[SOURCE_DTE_5], ";
+                sqlInsertCandidate += "[GRAD_YR_LAST_ORG], ";
+                sqlInsertCandidate += "[HIGH_SCHOOL], ";
+                sqlInsertCandidate += "[COUNSELOR_INITIALS], ";
+                sqlInsertCandidate += "[RESIDENT_OF_STATE], ";
+                sqlInsertCandidate += "[RECEIVING_VETERANS_BENEFITS], ";
+                sqlInsertCandidate += "[HAS_GED], ";
+                sqlInsertCandidate += "[GED_TEST_DTE], ";
+                sqlInsertCandidate += "[GED_TEST_CENTER_STATE], ";
+                sqlInsertCandidate += "[HAS_BEEN_ON_PROB_SUSPND_EXPLD], ";
+                sqlInsertCandidate += "[PROB_SUSPND_EXPLD_EXPLANATION], ";
+                sqlInsertCandidate += "[HAS_BEEN_CONVICTED_OF_FELONY], ";
+                sqlInsertCandidate += "[FELONY_EXPLANATION], ";
+                sqlInsertCandidate += "[CUR_CAND_TYPE], ";
+                sqlInsertCandidate += "[CUR_DEPT], ";
+                sqlInsertCandidate += "[CUR_DIV], ";
+                sqlInsertCandidate += "[CUR_LOC], ";
+                sqlInsertCandidate += "[CUR_PROG], ";
+                sqlInsertCandidate += "[CUR_STAGE], ";
+                sqlInsertCandidate += "[CUR_TRM], ";
+                sqlInsertCandidate += "[CUR_YR], ";
+                sqlInsertCandidate += "[USER_NAME], ";
+                sqlInsertCandidate += "[JOB_NAME], ";
+                sqlInsertCandidate += "[JOB_TIME] ";
+                sqlInsertCandidate += ") VALUES (";
+                //ID_NUM
+                sqlInsertCandidate += strJenzIDNum.QuoteOrNull() + ", ";
+                //SOURCE_5
+                sqlInsertCandidate += "1FERA".QuoteOrNull() + ", ";
+                //SOURCE_DTE_5
+                sqlInsertCandidate += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ", ";
+                //GRAD_YR_LAST_ORG
+                //  In csv as 1988-07-04, we only want first four, subtract one
+                try
+                {
+                    string HSGradYr = (Convert.ToInt32(thisLine[Program.GetColumnIndexOf("High School_Grad Date")].RemoveAllQuotes().GetFirst(4)) - 1).ToString();
+                    sqlInsertCandidate += HSGradYr.QuoteOrNull() + ", ";
+                }
+                catch
+                {
+                    sqlInsertCandidate += "".QuoteOrNull() + ", ";
+                }
+                
+                //HIGH_SCHOOL
+                //try getting from CEEB code
+                string strHSCode = Program.GetHSCodeFromCEEB(thisLine[Program.GetColumnIndexOf("High School_CEEB 1")].RemoveAllQuotes());
+                if (strHSCode == "")
+                {
+                    //then try getting it from hs name
+                    strHSCode = Program.GetHSCodeFromName(thisLine[Program.GetColumnIndexOf("High School_Name 1")].RemoveAllQuotes());
+                }
+                sqlInsertCandidate += strHSCode.QuoteOrNull() + ", ";
+
+                //COUNSELOR_INITIALS
+                sqlInsertCandidate += "".QuoteOrNull() + ", ";
+                //RESIDENT_OF_STATE
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Permanent Address_State")].RemoveAllQuotes().GetFirst(2).QuoteOrNull() + ", ";
+                //RECEIVING_VETERANS_BENEFITS
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Military_Veteran Dependent")].RemoveAllQuotes().GetFirst(1).DefaultTo("N").QuoteOrNull() + ", ";
+                //HAS_GED - Default to N
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("High School_GED")].RemoveAllQuotes().GetFirst(1).DefaultTo("N").QuoteOrNull() + ", ";
+                //GED_TEST_DTE
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("High School_GED Date")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                //GED_TEST_CENTER_STATE
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("High School_GED State")].RemoveAllQuotes().GetFirst(2).QuoteOrNull() + ", ";
+                //HAS_BEEN_ON_PROB_SUSPND_EXPLD
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Misc_Suspended")].RemoveAllQuotes().GetFirst(1).QuoteOrNull() + ", ";
+                //PROB_SUSPND_EXPLD_EXPLANATION
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Misc_Suspended Details")].RemoveAllQuotes().GetFirst(100).QuoteOrNull() + ", ";
+                //HAS_BEEN_CONVICTED_OF_FELONY
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Misc_Felony")].RemoveAllQuotes().GetFirst(1).QuoteOrNull() + ", ";
+                //FELONY_EXPLANATION
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Misc_Felony Details")].RemoveAllQuotes().GetFirst(100).QuoteOrNull() + ", ";
+                //CUR_CAND_TYPE
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Applicant Type")].RemoveAllQuotes().GetFirst(1).QuoteOrNull() + ", ";
+                //CUR_DEPT
+                sqlInsertCandidate += "".QuoteOrNull() + ", ";
+                //CUR_DIV
+                sqlInsertCandidate += "UG".QuoteOrNull() + ", ";
+                //CUR_LOC
+                sqlInsertCandidate += "MAIN".QuoteOrNull() + ", ";
+                //CUR_PROG
+                //like MUSCH
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Major")].RemoveAllQuotes().GetFirst(5).QuoteOrNull() + ", ";
+                //CUR_STAGE
+                if (thisLine[Program.GetColumnIndexOf("Freshman_College Credit")].RemoveAllQuotes() == "Y")
+                {
+                    sqlInsertCandidate += "11".QuoteOrNull() + ", ";
+                }
+                else
+                {
+                    sqlInsertCandidate += "10".QuoteOrNull() + ", ";
+                }
+                //CUR_TRM
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Entry Term")].RemoveAllQuotes().GetLast(2).QuoteOrNull() + ", ";
+                //CUR_YR
+                sqlInsertCandidate += thisLine[Program.GetColumnIndexOf("Entry Term")].RemoveAllQuotes().GetFirst(4).QuoteOrNull() + ", ";
+                //USER_NAME
+                sqlInsertCandidate += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                //JOB_NAME
+                sqlInsertCandidate += Program.JobName.QuoteOrNull() + ", ";
+                //JOB_TIME
+                sqlInsertCandidate += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+
+                #endregion
+
+                #region CANDIDACY
+                WriteLog("Generating CANDIDACY query...");
+                string sqlInsertCandidacy = "INSERT INTO [dbo].[NC_HOLDING_CANDIDACY] (";
+                sqlInsertCandidacy += "[ID_NUM], ";
+                sqlInsertCandidacy += "[CANDIDACY_TYPE], ";
+                sqlInsertCandidacy += "[DEPT_CDE], ";
+                sqlInsertCandidacy += "[DIV_CDE], ";
+                sqlInsertCandidacy += "[LOCA_CDE], ";
+                sqlInsertCandidacy += "[PROG_CDE], ";
+                sqlInsertCandidacy += "[STAGE], ";
+                sqlInsertCandidacy += "[TRM_CDE], ";
+                sqlInsertCandidacy += "[YR_CDE], ";
+                sqlInsertCandidacy += "[HIST_STAGE_DTE], ";
+                sqlInsertCandidacy += "[CUR_CANDIDACY], ";
+                sqlInsertCandidacy += "[USER_NAME], ";
+                sqlInsertCandidacy += "[JOB_NAME], ";
+                sqlInsertCandidacy += "[JOB_TIME] ";
+                sqlInsertCandidacy += ") VALUES (";
+                //ID_NUM
+                sqlInsertCandidacy += strJenzIDNum.QuoteOrNull() + ", ";
+                //CANDIDACY_TYPE
+                sqlInsertCandidacy += thisLine[Program.GetColumnIndexOf("Applicant Type")].RemoveAllQuotes().GetFirst(1).QuoteOrNull() + ", ";
+                //DEPT_CDE
+                sqlInsertCandidacy += "".QuoteOrNull() + ", ";
+                //DIV_CDE
+                sqlInsertCandidacy += "UG".QuoteOrNull() + ", ";
+                //LOCA_CDE
+                sqlInsertCandidacy += "MAIN".QuoteOrNull() + ", ";
+                //PROG_CDE
+                //TODO: look this up
+                sqlInsertCandidacy += "UND".QuoteOrNull() + ", ";
+                //STAGE
+                if (thisLine[Program.GetColumnIndexOf("Freshman_College Credit")].RemoveAllQuotes() == "Y")
+                {
+                    sqlInsertCandidacy += "11".QuoteOrNull() + ", ";
+                }
+                else
+                {
+                    sqlInsertCandidacy += "10".QuoteOrNull() + ", ";
+                }
+                //TRM_CDE
+                sqlInsertCandidacy += thisLine[Program.GetColumnIndexOf("Entry Term")].RemoveAllQuotes().GetLast(2).QuoteOrNull() + ", ";
+                //YR_CDE
+                sqlInsertCandidacy += thisLine[Program.GetColumnIndexOf("Entry Term")].RemoveAllQuotes().GetFirst(4).QuoteOrNull() + ", ";
+                //HIST_STAGE_DTE
+                sqlInsertCandidacy += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ", ";
+                //CUR_CANDIDACTY
+                sqlInsertCandidacy += "Y".QuoteOrNull() + ", ";
+                //USER_NAME
+                sqlInsertCandidacy += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                //JOB_NAME
+                sqlInsertCandidacy += Program.JobName.QuoteOrNull() + ", ";
+                //JOB_TIME
+                sqlInsertCandidacy += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+
+
+                #endregion
+
+                #region ATTRIBUTE_TRANS
+                WriteLog("Generating ATTRIBUTE_TRANS queries...");
+                string sqlInsertAttribute = "";
+
+                for (int i = 1; i < 10; i++)
+                {
+                    sqlInsertAttribute += "INSERT INTO [dbo].[NC_HOLDING_ATTRIBUTE_TRANS] (";
+                    sqlInsertAttribute += "[ID_NUM], ";
+                    sqlInsertAttribute += "[ATTRIB_SEQ], ";
+                    sqlInsertAttribute += "[ATTRIB_CDE], ";
+                    sqlInsertAttribute += "[SHOW_ON_WEB], ";
+                    sqlInsertAttribute += "[USER_NAME], ";
+                    sqlInsertAttribute += "[JOB_NAME], ";
+                    sqlInsertAttribute += "[JOB_TIME] ";
+                    sqlInsertAttribute += ") VALUES (";
+
+                    //ID_NUM
+                    sqlInsertAttribute += strJenzIDNum.QuoteOrNull() + ", ";
+                    //ATTRIB_SEQ
+                    sqlInsertAttribute += i.ToString().QuoteOrNull() + ", ";
+                    //ATTRIB_CDE
+                    sqlInsertAttribute += thisLine[Program.GetColumnIndexOf("Activity " + i.ToString() + " (MC)")].RemoveAllQuotes().GetFirst(5).QuoteOrNull() + ", ";
+                    //SHOW_ON_WEB
+                    sqlInsertAttribute += "Y".QuoteOrNull() + ", ";
+                    //USER_NAME
+                    sqlInsertAttribute += Program.GetJobUsername().GetFirst(15).QuoteOrNull() + ", ";
+                    //JOB_NAME
+                    sqlInsertAttribute += Program.JobName.QuoteOrNull() + ", ";
+                    //JOB_TIME
+                    sqlInsertAttribute += DateTime.Now.ToSQLDatetime().QuoteOrNull() + "); ";
+                }
+
+
+                #endregion
+
+                #region ETHNIC_RACE_REPORT
+                WriteLog("Generating ETHNIC_RACE_REPORT query...");
+                string sqlInsertEthnic = "";
+                sqlInsertEthnic += "INSERT INTO [dbo].[NC_HOLDING_ETHNIC_RACE_REPORT] (";
+                sqlInsertEthnic += "[ID_NUM], ";
+                sqlInsertEthnic += "[SEQ_NUM], ";
+                sqlInsertEthnic += "[IPEDS_REPORT_VALUE], ";
+                sqlInsertEthnic += "[REPORT_COMMENT], ";
+                sqlInsertEthnic += "[USER_NAME], ";
+                sqlInsertEthnic += "[JOB_NAME], ";
+                sqlInsertEthnic += "[JOB_TIME] ";
+                sqlInsertEthnic += ") VALUES (";
+                
+                //ID_NUM
+                sqlInsertEthnic += strJenzIDNum.QuoteOrNull() + ", ";
+                //SEQ_NUM
+                sqlInsertEthnic += "1".QuoteOrNull() + ", ";
+                //IPEDS_REPORT_VALUE
+                sqlInsertEthnic += DetermineIPEDSGroup(
+                    thisLine[Program.GetColumnIndexOf("Hispanic/Latino Status")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (American Indian or Alaska Native (including all Original Peoples of the Americas))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (Asian (including Indian subcontinent and Phillippines))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (Black of African American (including Africa and Caribbean))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (Native Hawaiian or Other Pacific Islander (Original Peoples))")].RemoveAllQuotes(),
+                    thisLine[Program.GetColumnIndexOf("Ethnicity (White (including Middle Eastern))")].RemoveAllQuotes()).QuoteOrNull() + ", ";
+                //REPORT_COMMENT
+                sqlInsertEthnic += "Import from Fire Engine Red".QuoteOrNull() + ", ";
+                //USER_NAME
+                sqlInsertEthnic += Program.GetJobUsername().GetFirst(15).QuoteOrNull() + ", ";
+                //JOB_NAME
+                sqlInsertEthnic += Program.JobName.QuoteOrNull() + ", ";
+                //JOB_TIME
+                sqlInsertEthnic += DateTime.Now.ToSQLDatetime().QuoteOrNull() + "); ";
+
+                #endregion
+
+                string sqlInsertAddressMail = "";
+                if (thisLine[Program.GetColumnIndexOf("Mailing Address_Different")] == "Y")
+                {
+                    WriteLog("Generating ADDRESS_MASTER query for mailing address...");
+                    #region ADDRESS_MASTER_MAIL
+                    sqlInsertAddressMail = "INSERT INTO [dbo].[NC_HOLDING_ADDRESS_MASTER] (";
+                    sqlInsertAddressMail += "[ID_NUM], ";
+                    sqlInsertAddressMail += "[ADDR_CDE], ";
+                    sqlInsertAddressMail += "[ADDR_LINE_1], ";
+                    sqlInsertAddressMail += "[ADDR_LINE_2], ";
+                    sqlInsertAddressMail += "[CITY], ";
+                    sqlInsertAddressMail += "[STATE], ";
+                    sqlInsertAddressMail += "[ZIP], ";
+                    sqlInsertAddressMail += "[COUNTY], ";
+                    sqlInsertAddressMail += "[COUNTRY], ";
+                    sqlInsertAddressMail += "[USER_NAME], ";
+                    sqlInsertAddressMail += "[JOB_NAME], ";
+                    sqlInsertAddressMail += "[JOB_TIME] ";
+                    sqlInsertAddressMail += ") VALUES (";
+                    //ID_NUM
+                    sqlInsertAddressMail += strJenzIDNum.QuoteOrNull() + ", ";
+                    //ADDR_CDE
+                    sqlInsertAddressMail += "BSHP".QuoteOrNull() + ", "; // BSHP = shipping address
+                    //ADDR_LINE_1
+                    sqlInsertAddressMail += thisLine[Program.GetColumnIndexOf("Mailing Address_Address 1")].RemoveAllQuotes().GetFirst(60).QuoteOrNull() + ", ";
+                    //ADDR_LINE_2
+                    sqlInsertAddressMail += thisLine[Program.GetColumnIndexOf("Mailing Address_Address 2")].RemoveAllQuotes().GetFirst(60).QuoteOrNull() + ", ";
+                    //CITY
+                    sqlInsertAddressMail += thisLine[Program.GetColumnIndexOf("Mailing Address_City")].RemoveAllQuotes().GetFirst(25).QuoteOrNull() + ", ";
+                    //STATE
+                    sqlInsertAddressMail += thisLine[Program.GetColumnIndexOf("Mailing Address_State")].RemoveAllQuotes().GetFirst(2).QuoteOrNull() + ", ";
+                    //ZIP
+                    sqlInsertAddressMail += Program.WhicheverHasContent(thisLine[Program.GetColumnIndexOf("Mailing Address_ZIP")], thisLine[Program.GetColumnIndexOf("Mailing Address_ZIP_Intl")]).RemoveAllQuotes().GetFirst(12).QuoteOrNull() + ", ";
+                    //COUNTY
+                    sqlInsertAddressMail += thisLine[Program.GetColumnIndexOf("Mailing Address_County")].RemoveAllQuotes().GetFirst(5).QuoteOrNull() + ", ";
+                    //COUNTRY
+                    sqlInsertAddressMail += thisLine[Program.GetColumnIndexOf("Mailing Address_Country")].RemoveAllQuotes().GetFirst(3).QuoteOrNull() + ", ";
+                    //USER_NAME
+                    sqlInsertAddressMail += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                    //JOB_NAME
+                    sqlInsertAddressMail += Program.JobName.QuoteOrNull() + ", ";
+                    //JOB_TIME
+                    sqlInsertAddressMail += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+                    #endregion
+                }
+
+                #region ADDRESS_MASTER_PARENT
+                WriteLog("Generating ADDRESS_MASTER query for parent address...");
+                string sqlInsertAddressParent = "";
+                if ((thisLine[Program.GetColumnIndexOf("Family_Permanent Home")].RemoveAllQuotes() == "Both Parents") || (thisLine[Program.GetColumnIndexOf("Family_Permanent Home")].RemoveAllQuotes() == "Mother"))
+                {
+                    //Use mom's address
+                    sqlInsertAddressParent = "INSERT INTO [dbo].[NC_HOLDING_ADDRESS_MASTER] (";
+                    sqlInsertAddressParent += "[ID_NUM], ";
+                    sqlInsertAddressParent += "[ADDR_CDE], ";
+                    sqlInsertAddressParent += "[ATTENTION_LINE], ";
+                    sqlInsertAddressParent += "[ADDR_LINE_1], ";
+                    sqlInsertAddressParent += "[ADDR_LINE_2], ";
+                    sqlInsertAddressParent += "[CITY], ";
+                    sqlInsertAddressParent += "[STATE], ";
+                    sqlInsertAddressParent += "[ZIP], ";
+                    sqlInsertAddressParent += "[COUNTY], ";
+                    sqlInsertAddressParent += "[COUNTRY], ";
+                    sqlInsertAddressParent += "[USER_NAME], ";
+                    sqlInsertAddressParent += "[JOB_NAME], ";
+                    sqlInsertAddressParent += "[JOB_TIME] ";
+                    sqlInsertAddressParent += ") VALUES (";
+                    //ID_NUM
+                    sqlInsertAddressParent += strJenzIDNum.QuoteOrNull() + ", ";
+                    //ADDR_CDE
+                    sqlInsertAddressParent += "PGDN".QuoteOrNull() + ", ";
+                    //ATTENTION_LINE
+                    sqlInsertAddressParent += (thisLine[Program.GetColumnIndexOf("Family_Mother_First Name")] + " " + thisLine[Program.GetColumnIndexOf("Family_Mother_Middle Name")] + " " + thisLine[Program.GetColumnIndexOf("Family_Mother_Last Name")]).RemoveAllQuotes().QuoteOrNull() + ", ";
+                    if (thisLine[Program.GetColumnIndexOf("Family_Mother_Diff Address")].RemoveAllQuotes() == "Y")
+                    {
+                        //ADDR_LINE_1
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Mother_Address_Street 1")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ADDR_LINE_2
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Mother_Address_Street 2")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //CITY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Mother_Address_City")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //STATE
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Mother_Address_State")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ZIP
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Mother_Address_ZIP")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //COUNTY
+                        sqlInsertAddressParent += "".QuoteOrNull() + ", ";
+                        //COUNTRY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Mother_Address_Country")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                    }
+                    else
+                    {
+                        //ADDR_LINE_1
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_Address 1")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ADDR_LINE_2
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_Address 2")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //CITY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_City")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //STATE
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_State")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ZIP
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_ZIP")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //COUNTY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_County")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //COUNTRY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_Country")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                    }
+                    //USER_NAME
+                    sqlInsertAddressParent += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                    //JOB_NAME
+                    sqlInsertAddressParent += Program.JobName.QuoteOrNull() + ", ";
+                    //JOB_TIME
+                    sqlInsertAddressParent += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+
+                }else if(thisLine[Program.GetColumnIndexOf("Family_Permanent Home")].RemoveAllQuotes() == "Father"){
+                    //Use dad's address
+                    sqlInsertAddressParent = "INSERT INTO [dbo].[NC_HOLDING_ADDRESS_MASTER] (";
+                    sqlInsertAddressParent += "[ID_NUM], ";
+                    sqlInsertAddressParent += "[ADDR_CDE], ";
+                    sqlInsertAddressParent += "[ATTENTION_LINE], ";
+                    sqlInsertAddressParent += "[ADDR_LINE_1], ";
+                    sqlInsertAddressParent += "[ADDR_LINE_2], ";
+                    sqlInsertAddressParent += "[CITY], ";
+                    sqlInsertAddressParent += "[STATE], ";
+                    sqlInsertAddressParent += "[ZIP], ";
+                    sqlInsertAddressParent += "[COUNTY], ";
+                    sqlInsertAddressParent += "[COUNTRY], ";
+                    sqlInsertAddressParent += "[USER_NAME], ";
+                    sqlInsertAddressParent += "[JOB_NAME], ";
+                    sqlInsertAddressParent += "[JOB_TIME] ";
+                    sqlInsertAddressParent += ") VALUES (";
+                    //ID_NUM
+                    sqlInsertAddressParent += strJenzIDNum.QuoteOrNull() + ", ";
+                    //ADDR_CDE
+                    sqlInsertAddressParent += "PGDN".QuoteOrNull() + ", ";
+                    //ATTENTION_LINE
+                    sqlInsertAddressParent += (thisLine[Program.GetColumnIndexOf("Family_Father_First Name")] + " " + thisLine[Program.GetColumnIndexOf("Family_Father_Middle Name")] + " " + thisLine[Program.GetColumnIndexOf("Family_Father_Last Name")]).RemoveAllQuotes().QuoteOrNull() + ", ";
+                    if (thisLine[Program.GetColumnIndexOf("Family_Father_Diff Address")].RemoveAllQuotes() == "Y")
+                    {
+                        //ADDR_LINE_1
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Father_Address_Street 1")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ADDR_LINE_2
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Father_Address_Street 2")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //CITY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Father_Address_City")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //STATE
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Father_Address_State")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ZIP
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Father_Address_ZIP")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //COUNTY
+                        sqlInsertAddressParent += "".QuoteOrNull() + ", ";
+                        //COUNTRY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Family_Father_Address_Country")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                    }
+                    else
+                    {
+                        //ADDR_LINE_1
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_Address 1")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ADDR_LINE_2
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_Address 2")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //CITY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_City")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //STATE
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_State")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //ZIP
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_ZIP")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //COUNTY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_County")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                        //COUNTRY
+                        sqlInsertAddressParent += thisLine[Program.GetColumnIndexOf("Permanent Address_Country")].RemoveAllQuotes().QuoteOrNull() + ", ";
+                    }
+                    //USER_NAME
+                    sqlInsertAddressParent += Program.GetJobUsername().GetFirst(513).QuoteOrNull() + ", ";
+                    //JOB_NAME
+                    sqlInsertAddressParent += Program.JobName.QuoteOrNull() + ", ";
+                    //JOB_TIME
+                    sqlInsertAddressParent += DateTime.Now.ToSQLDatetime().QuoteOrNull() + ");";
+                }
+                #endregion
+
+                //Now execute these queries
+                WriteLog("Executing insert queries...");
+                WriteLog(sqlInsertName);
+                Program.ExecuteQuery(sqlInsertName);
+
+                WriteLog(sqlInsertAddress);
+                Program.ExecuteQuery(sqlInsertAddress);
+                
+                WriteLog(sqlInsertBiograph);
+                Program.ExecuteQuery(sqlInsertBiograph);
+                
+                WriteLog(sqlInsertCandidate);
+                Program.ExecuteQuery(sqlInsertCandidate);
+                
+                WriteLog(sqlInsertCandidacy);
+                Program.ExecuteQuery(sqlInsertCandidacy);
+
+                WriteLog(sqlInsertAttribute);
+                Program.ExecuteQuery(sqlInsertAttribute);
+
+                WriteLog(sqlInsertEthnic);
+                Program.ExecuteQuery(sqlInsertEthnic);
+
+                if (sqlInsertAddressMail != ""){
+                    WriteLog(sqlInsertAddressMail);
+                    Program.ExecuteQuery(sqlInsertAddressMail);
+                }
+
+                if (sqlInsertAddressParent != "")
+                {
+                    WriteLog(sqlInsertAddressParent);
+                    Program.ExecuteQuery(sqlInsertAddressParent);
+                }
+
+                WriteLog(whichLine.Ordinal() + " applicant successfully added to the Jenzabar holding tables.");
+
+                if (thisLine[Program.GetColumnIndexOf("Personal Statement_Copy/Paste")].RemoveAllQuotes() == "")
+                {
+                    WriteLog(whichLine.Ordinal() + " applicant has no personal statement.", true);
+                }
+                else
+                {
+                    WriteLog("Saving " + whichLine.Ordinal() + " applicant's personal statement as txt file...");
+                    WriteStringToFile(thisLine[Program.GetColumnIndexOf("Personal Statement_Copy/Paste")].RemoveAllQuotes(),
+                        "\\Personal Statements\\" +
+                        thisLine[Program.GetColumnIndexOf("Last Name")].RemoveAllQuotes() +
+                        ", " +
+                        thisLine[Program.GetColumnIndexOf("First Name")].RemoveAllQuotes() +
+                        ".txt");
+                    WriteLog(whichLine.Ordinal() + " applicant's personal statement saved.", true);
+                }
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                //Was unable to write this candidate record.
+                WriteLog(whichLine.Ordinal() + " applicant could not be written to the Jenzabar holding tables." , true);
+                WriteLog(ex.Message);
+
+                //add this row to errors csv
+                ErroneousRows.Add(whichLine);
+                return;
+            }
+        }
+
+
+        private string DetermineEthnicGroup(string HisLatStat, string AmInAlaskaNat, string Asian, string Black, string PacificIs, string White)
+        {
+            
+            //If more than one of these are true then return M
+            int count = 0;
+            if (HisLatStat == "Yes") { count++; }
+            if (AmInAlaskaNat == "Yes") { count++; }
+            if (Asian == "Yes") { count++; }
+            if (Black == "Yes") { count++; }
+            if (PacificIs == "Yes") { count++; }
+            if (White == "Yes") { count++; }
+
+            if (count > 1) { return "M"; }
+
+            //Otherwise, break it down
+            if (HisLatStat == "Yes") { return "4"; }
+            if (AmInAlaskaNat == "Yes") { return "2"; }
+            if (Asian == "Yes") { return "2"; }
+            if (Black == "Yes") { return "1"; }
+            if (PacificIs == "Yes") { return "3"; }
+            if (White == "Yes") { return "5"; }
+
+            //Otherwise, 'Race Unknown'
+            return "8";
+        }
+
+        private string DetermineIPEDSGroup(string HisLatStat, string AmInAlaskaNat, string Asian, string Black, string PacificIs, string White)
+        {
+
+            //If more than one of these are true then return 9
+            int count = 0;
+            if (HisLatStat == "Yes") { count++; }
+            if (AmInAlaskaNat == "Yes") { count++; }
+            if (Asian == "Yes") { count++; }
+            if (Black == "Yes") { count++; }
+            if (PacificIs == "Yes") { count++; }
+            if (White == "Yes") { count++; }
+
+            if (count > 1) { return "9"; }
+
+            //Otherwise, break it down
+            if (HisLatStat == "Yes") { return "3"; }
+            if (AmInAlaskaNat == "Yes") { return "4"; }
+            if (Asian == "Yes") { return "5"; }
+            if (Black == "Yes") { return "6"; }
+            if (PacificIs == "Yes") { return "7"; }
+            if (White == "Yes") { return "8"; }
+
+            //Otherwise, 'Race Unknown'
+            return "2";
+        }
+
+        /// <summary>
+        /// Writes to the file log
+        /// </summary>
+        /// <param name="LogText">Text to log</param>
+        /// <param name="ShowInUserLog">Optional. If true, writes log to textbox also. Default = false.</param>
+        private void WriteLog(string LogText, Boolean ShowInUserLog = false)
+        {
+            try
+            {
+                string strFileName = System.AppDomain.CurrentDomain.FriendlyName + ".log.txt";
+                using (StreamWriter w = File.AppendText(strFileName))
+                {
+                    w.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " - " + LogText);
+                }
+
+                if (ShowInUserLog)
+                {
+                    txtLog.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " - " + LogText + "\n\n");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Error! Unable to write to log file. This tool will now exit.");
+                Program.CommitSuicide();
+            }
+        }
+
+        /// <summary>
+        /// Writes string to file in the application's directory
+        /// </summary>
+        /// <param name="strContent"></param>
+        /// <param name="strFileName"></param>
+        private void WriteStringToFile(string strContent, string strFileName)
+        {
+            string strFileLoc = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + strFileName;
+            using (StreamWriter w = File.AppendText(strFileLoc))
+            {
+                w.WriteLine(strContent);
+            }
+        }
+
+
+    }
+}

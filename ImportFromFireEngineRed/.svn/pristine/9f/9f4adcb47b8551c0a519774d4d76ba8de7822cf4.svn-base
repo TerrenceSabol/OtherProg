@@ -1,0 +1,871 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Data.SqlClient;
+using System.Data;
+
+namespace ImportFromFireEngineRed
+{
+    static class Program
+    {
+        #region Configuration
+
+        /// <summary>
+        /// If 'True,' nothing is written to the database
+        /// </summary>
+        public static Boolean DebugMode = true;
+
+        public static string DatabaseUsername = "DotNetApp";
+        public static string DatabasePassword = "2dOI64LCazsbQzFtCWpb";
+        public static string DatabaseHostname = "ncfuturesql";
+        public static string DatabaseCatalog = "FUTURE01_TmsEPrd";
+        public static string JobName = "ImportFromFER";
+
+        /// <summary>
+        /// CSV column titles and numbers
+        /// </summary>
+        public static string[,] ColumnIndex = { 
+            //Configure these to match the 0-based column locations
+            //This is here in case the format changes again next year, we can simply modify this locations index
+            {"User ID","0"},
+            {"Is Complete","1"},
+            {"Date Completed","2"},
+            {"Original Email","3"},
+            {"Search_ID","4"},
+            {"Source","5"},
+            {"Search Cycle","6"},
+            {"Unique_Key","7"},
+            {"First Name","8"},
+            {"Middle Name","9"},
+            {"Last Name","10"},
+            {"Suffix","11"},
+            {"Preferred Name / Nickname","12"},
+            {"Former Last Name","13"},
+            {"DOB","14"},
+            {"Gender","15"},
+            {"Marital Status","16"},
+            {"Birth_Country","17"},
+            {"Birth_State","18"},
+            {"Birth_City","19"},
+            {"Citizenship Status","20"},
+            {"Permanent Resident Number","21"},
+            {"Citizenship Country","22"},
+            {"SSN","23"},
+            {"Visa_Type","24"},
+            {"Visa_Type_Other","25"},
+            {"First Language_English","26"},
+            {"First Language_Other","27"},
+            {"First Language_Other 1","28"},
+            {"Home Phone","29"},
+            {"Home_Phone_Intl","30"},
+            {"Cell Phone","31"},
+            {"Mobile_Phone_Intl","32"},
+            {"Preferred Telephone","33"},
+            {"Email Address","34"},
+            {"IM Address","35"},
+            {"Permanent Address_Country","36"},
+            {"Permanent Address_Address 1","37"},
+            {"Permanent Address_Address 2","38"},
+            {"Permanent Address_City","39"},
+            {"Permanent Address_State","40"},
+            {"Permanent Address_County","41"},
+            {"Permanent Address_ZIP","42"},
+            {"Permanent Address_ZIP_Intl","43"},
+            {"Mailing Address_Different","44"},
+            {"Mailing Address_Country","45"},
+            {"Mailing Address_Address 1","46"},
+            {"Mailing Address_Address 2","47"},
+            {"Mailing Address_City","48"},
+            {"Mailing Address_State","49"},
+            {"Mailing Address_County","50"},
+            {"Mailing Address_ZIP","51"},
+            {"Mailing Address_ZIP_Intl","52"},
+            {"Mailing Address_Valid From","53"},
+            {"Mailing Address_Valid Until","54"},
+            {"Military_Veteran","55"},
+            {"Military_Veteran Branch","56"},
+            {"Military Veteran Benefits","57"},
+            {"Military_Active Duty","58"},
+            {"Military_Active Branch","59"},
+            {"Military_Veteran Dependent","60"},
+            {"Religious Preference","61"},
+            {"Religion_Lutheran Minister","62"},
+            {"Hispanic/Latino Status","63"},
+            {"Hispanic/Latino_Background","64"},
+            {"Ethnicity (American Indian or Alaska Native (including all Original Peoples of the Americas))","65"},
+            {"Ethnicity (Asian (including Indian subcontinent and Phillippines))","66"},
+            {"Ethnicity (Black of African American (including Africa and Caribbean))","67"},
+            {"Ethnicity (Native Hawaiian or Other Pacific Islander (Original Peoples))","68"},
+            {"Ethnicity (White (including Middle Eastern))","69"},
+            {"Ethnicity_Tribal Number","70"},
+            {"Entry Term","71"},
+            {"Applicant Type","72"},
+            {"Freshman_College Credit","73"},
+            {"Transfer_24 Credit Hours","74"},
+            {"Misc_Readmit Attend Other Colleges","75"},
+            {"Major","76"},
+            {"Music_Instrument","77"},
+            {"Music_Lessons","78"},
+            {"Music_Lessons_Time","79"},
+            {"Music_Piano","80"},
+            {"Music_Band","81"},
+            {"Music_Band_High School","82"},
+            {"Music_Choir","83"},
+            {"Music_Choir_High School","84"},
+            {"Music_Orchestra","85"},
+            {"Music_Orchestra_High School","86"},
+            {"FT/PT Status","87"},
+            {"Housing Status","88"},
+            {"Misc_Previously Attended","89"},
+            {"Misc_Previously Attended From","90"},
+            {"Misc_Previously Attended To","91"},
+            {"FinAid_Apply","92"},
+            {"Scholarship_Apply","93"},
+            {"Family_Parent_Marital Status","94"},
+            {"Family_Permanent Home","95"},
+            {"Family_First to Attend College","96"},
+            {"Family_Father_First Name","97"},
+            {"Family_Father_Middle Name","98"},
+            {"Family_Father_Last Name","99"},
+            {"Family_Father_Living","100"},
+            {"Family_Father_Date Deceased","101"},
+            {"Family_Father_Email","102"},
+            {"Family_Father_Telephone","103"},
+            {"Family_Father_Telephone Intl","104"},
+            {"Family_Father_Telephone Type","105"},
+            {"Family_Father_Occupation","106"},
+            {"Family_Father_Employer","107"},
+            {"Family_Father_Diff Address","108"},
+            {"Family_Father_Country Address","109"},
+            {"Family_Father_Street 1","110"},
+            {"Family_Father_Street 2","111"},
+            {"Family_Father_City Address","112"},
+            {"Family_Father_State Address","113"},
+            {"Family_Father_Address_ZIP","114"},
+            {"Family_Father_Address_Postal Code","115"},
+            {"Family_Father_Attend College","116"},
+            {"Family_Father_College","117"},
+            {"Family_Father_College Degree (MC)","118"},
+            {"Family_Father_College Degree","119"},
+            {"Family_Father_College Degree Year","120"},
+            {"Family_Father_Attend Grad School","121"},
+            {"Family_Father_Grad School","122"},
+            {"Family_Father_Grad Degree (MC)","123"},
+            {"Family_Father_Grad Degree Earned","124"},
+            {"Family_Father_Grad Degree Year","125"},
+            {"Family_Mother_First Name","126"},
+            {"Family_Mother_Middle Name","127"},
+            {"Family_Mother_Last Name","128"},
+            {"Family_Mother_Living","129"},
+            {"Family_Mother_Date Deceased","130"},
+            {"Family_Mother_Email","131"},
+            {"Family_Mother_Telephone","132"},
+            {"Family_Mother_Telephone Intl","133"},
+            {"Family_Mother_Telephone Type","134"},
+            {"Family_Mother_Occupation","135"},
+            {"Family_Mother_Employer","136"},
+            {"Family_Mother_Diff Address","137"},
+            {"Family_Mother_Address_Country","138"},
+            {"Family_Mother_Address_Street 1","139"},
+            {"Family_Mother_Address_Street 2","140"},
+            {"Family_Mother_Address_City","141"},
+            {"Family_Mother_Address_State","142"},
+            {"Family_Mother_Address_ZIP","143"},
+            {"Family_Mother_Address_Postal Code","144"},
+            {"Family_Mother_Attend College","145"},
+            {"Family_Mother_College","146"},
+            {"Family_Mother_College Degree (MC)","147"},
+            {"Family_Mother_College Degree","148"},
+            {"Family_Mother_College Degree Year","149"},
+            {"Family_Mother_Attend Grad School","150"},
+            {"Family_Mother_Grad School","151"},
+            {"Family_Mother_Grad Degree (MC)","152"},
+            {"Family_Mother_Grad Degree Earned","153"},
+            {"Family_Mother_Grad Degree Year","154"},
+            {"Family_Add Guardian","155"},
+            {"Family_Guardian_Relationship","156"},
+            {"Family_Guardian_First Name","157"},
+            {"Family_Guardian_Middle Name","158"},
+            {"Family_Guardian_Last Name","159"},
+            {"Family_Guardian_Living","160"},
+            {"Family_Guardian_Date Deceased","161"},
+            {"Family_Guardian_Email","162"},
+            {"Family_Guardian_Telephone","163"},
+            {"Family_Guardian_Telephone Intl","164"},
+            {"Family_Guardian_Telephone Type","165"},
+            {"Family_Guardian_Occupation","166"},
+            {"Family_Guardian_Employer","167"},
+            {"Family_Guardian_Diff Address","168"},
+            {"Family_Guardian_Address_Country","169"},
+            {"Family_Guardian_Address_Street 1","170"},
+            {"Family_Guardian_Address_Street 2","171"},
+            {"Family_Guardian_Address_City","172"},
+            {"Family_Guardian_Address_State","173"},
+            {"Family_Guardian_Address_ZIP","174"},
+            {"Family_Guardian_Address_Postal Code","175"},
+            {"Family_Guardian_Attend College","176"},
+            {"Family_Guardian_College","177"},
+            {"Family_Guardian_College Degree (MC)","178"},
+            {"Family_Guardian_College Degree","179"},
+            {"Family_Guardian_College Degree Year","180"},
+            {"Family_Guardian_Attend Grad School","181"},
+            {"Family_Guardian_Grad School","182"},
+            {"Family_Guardian_Grad Degree (MC)","183"},
+            {"Family_Guardian_Grad Degree Earned","184"},
+            {"Family_Guardian_Grad Degree Year","185"},
+            {"Family_Legacy","186"},
+            {"Family_Legacy_First Name 1","187"},
+            {"Family_Legacy_Last Name 1","188"},
+            {"Family_Legacy_Relationship 1","189"},
+            {"Family_Legacy_Grad Year 1","190"},
+            {"Family_Legacy_Add Legacy 2","191"},
+            {"Family_Legacy_First Name 2","192"},
+            {"Family_Legacy_Last Name 2","193"},
+            {"Family_Legacy_Relationship 2","194"},
+            {"Family_Legacy_Grad Year 2","195"},
+            {"Family_Legacy_Add Legacy 3","196"},
+            {"Family_Legacy_First Name 3","197"},
+            {"Family_Legacy_Last Name 3","198"},
+            {"Family_Legacy_Relationship 3","199"},
+            {"Family_Legacy_Grad Year 3","200"},
+            {"High School_Type 1","201"},
+            {"High School_CEEB 1","202"},
+            {"High School_Name 1","203"},
+            {"High School _Country 1","204"},
+            {"High School_State 1","205"},
+            {"High School _City 1","206"},
+            {"HIgh School_Attended From 1","207"},
+            {"High School_Attended To 1","208"},
+            {"High School_GED","209"},
+            {"High School_Grad Date","210"},
+            {"High School_GED Date","211"},
+            {"High School_GED State","212"},
+            {"High School_AP/IB Credit","213"},
+            {"High School_Counselor_First Name","214"},
+            {"High School_Counselor_Last Name","215"},
+            {"High School_Counselor_Title","216"},
+            {"High School_Counselor_Email","217"},
+            {"High School_Counselor_Telephone","218"},
+            {"High School_Counselor_Telephone Intl","219"},
+            {"High School_Counselor_Fax","220"},
+            {"High School_Counselor_Fax Intl","221"},
+            {"High School_Add HS 2","222"},
+            {"High School_Type 2","223"},
+            {"High School_CEEB 2","224"},
+            {"High School_Name 2","225"},
+            {"High School _Country 2","226"},
+            {"High School_State 2","227"},
+            {"High School _City 2","228"},
+            {"High School_Attended From 2","229"},
+            {"High School_Attended To 2","230"},
+            {"High School_Add HS 3","231"},
+            {"High School_Type 3","232"},
+            {"High School_CEEB 3","233"},
+            {"High School_Name 3","234"},
+            {"High School _Country 3","235"},
+            {"High School_State 3","236"},
+            {"High School _City 3","237"},
+            {"High School_Attended From 3","238"},
+            {"High School_Attended To 3","239"},
+            {"Honors_Honor 1","240"},
+            {"Honors_Grade Level 1 (9)","241"},
+            {"Honors_Grade Level 1 (10)","242"},
+            {"Honors_Grade Level 1 (11)","243"},
+            {"Honors_Grade Level 1 (12)","244"},
+            {"Honors_Recognition Level 1","245"},
+            {"Honors_Honor 2","246"},
+            {"Honors_Grade Level 2 (9)","247"},
+            {"Honors_Grade Level 2 (10)","248"},
+            {"Honors_Grade Level 2 (11)","249"},
+            {"Honors_Grade Level 2 (12)","250"},
+            {"Honors_Recognition Level 2","251"},
+            {"Honors_Add Honor 3","252"},
+            {"Honors_Honor 3","253"},
+            {"Honors_Grade Level 3 (9)","254"},
+            {"Honors_Grade Level 3 (10)","255"},
+            {"Honors_Grade Level 3 (11)","256"},
+            {"Honors_Grade Level 3 (12)","257"},
+            {"Honors_Recognition Level 3","258"},
+            {"Honors_Add Honor 4","259"},
+            {"Honors_Honor 4","260"},
+            {"Honors_Grade Level 4 (9)","261"},
+            {"Honors_Grade Level 4 (10)","262"},
+            {"Honors_Grade Level 4 (11)","263"},
+            {"Honors_Grade Level 4 (12)","264"},
+            {"Honors_Recognition Level 4","265"},
+            {"Honors_Add Honor 5","266"},
+            {"Honors_Honor 5","267"},
+            {"Honors_Grade Level 5 (9)","268"},
+            {"Honors_Grade Level 5 (10)","269"},
+            {"Honors_Grade Level 5 (11)","270"},
+            {"Honors_Grade Level 5 (12)","271"},
+            {"Honors_Recognition Level 5","272"},
+            {"Activity 1 (MC)","273"},
+            {"Activities_Activity 1_Other","274"},
+            {"Activities_Grade Level 1 (9)","275"},
+            {"Activities_Grade Level 1 (10)","276"},
+            {"Activities_Grade Level 1 (11)","277"},
+            {"Activities_Grade Level 1 (12)","278"},
+            {"Activities_Details 1","279"},
+            {"Activities_College Participation 1","280"},
+            {"Activity 2 (MC)","281"},
+            {"Activities_Activity 2_Other","282"},
+            {"Activities_Grade Level 2 (9)","283"},
+            {"Activities_Grade Level 2 (10)","284"},
+            {"Activities_Grade Level 2 (11)","285"},
+            {"Activities_Grade Level 2 (12)","286"},
+            {"Activities_Details 2","287"},
+            {"Activities_College Participation 2","288"},
+            {"Activity 3 (MC)","289"},
+            {"Activities_Activity 3_Other","290"},
+            {"Activities_Grade Level 3 (9)","291"},
+            {"Activities_Grade Level 3 (10)","292"},
+            {"Activities_Grade Level 3 (11)","293"},
+            {"Activities_Grade Level 3 (12)","294"},
+            {"Activities_Details 3","295"},
+            {"Activities_College Participation 3","296"},
+            {"Activities_Add Activity 4","297"},
+            {"Activity 4 (MC)","298"},
+            {"Activities_Activity 4_Other","299"},
+            {"Activities_Grade Level 4 (9)","300"},
+            {"Activities_Grade Level 4 (10)","301"},
+            {"Activities_Grade Level 4 (11)","302"},
+            {"Activities_Grade Level 4 (12)","303"},
+            {"Activities_Details 4","304"},
+            {"Activities_College Participation 4","305"},
+            {"Activities_Add Activity 5","306"},
+            {"Activity 5 (MC)","307"},
+            {"Activities_Activity 5_Other","308"},
+            {"Activities_Grade Level 5 (9)","309"},
+            {"Activities_Grade Level 5 (10)","310"},
+            {"Activities_Grade Level 5 (11)","311"},
+            {"Activities_Grade Level 5 (12)","312"},
+            {"Activities_Details 5","313"},
+            {"Activities_College Participation 5","314"},
+            {"Activities_Add Activity 6","315"},
+            {"Activity 6 (MC)","316"},
+            {"Activities_Activity 6_Other","317"},
+            {"Activities_Grade Level 6 (9)","318"},
+            {"Activities_Grade Level 6 (10)","319"},
+            {"Activities_Grade Level 6 (11)","320"},
+            {"Activities_Grade Level 6 (12)","321"},
+            {"Activities_Details 6","322"},
+            {"Activities_College Participation 6","323"},
+            {"Activities_Add Activity 7","324"},
+            {"Activity 7 (MC)","325"},
+            {"Activities_Activity 7_Other","326"},
+            {"Activities_Grade Level 7 (9)","327"},
+            {"Activities_Grade Level 7 (10)","328"},
+            {"Activities_Grade Level 7 (11)","329"},
+            {"Activities_Grade Level 7 (12)","330"},
+            {"Activities_Details 7","331"},
+            {"Activities_College Participation 7","332"},
+            {"Activities_Add Activity 8","333"},
+            {"Activity 8 (MC)","334"},
+            {"Activities_Activity 8","335"},
+            {"Activities_Grade Level 8 (9)","336"},
+            {"Activities_Grade Level 8 (10)","337"},
+            {"Activities_Grade Level 8 (11)","338"},
+            {"Activities_Grade Level 8 (12)","339"},
+            {"Activities_Details 8","340"},
+            {"Activities_College Participation 8","341"},
+            {"Activities_Add Activity 9","342"},
+            {"Activity 9 (MC)","343"},
+            {"Activities_Activity 9_Other","344"},
+            {"Activities_Grade Level 9 (9)","345"},
+            {"Activities_Grade Level 9 (10)","346"},
+            {"Activities_Grade Level 9 (11)","347"},
+            {"Activities_Grade Level 9 (12)","348"},
+            {"Activities_Details 9","349"},
+            {"Activities_College Participation 9","350"},
+            {"Activities_Add Activity 10","351"},
+            {"Activity 10 (MC)","352"},
+            {"Activities_Activity 10_Other","353"},
+            {"Activities_Grade Level 10 (9)","354"},
+            {"Activities_Grade Level 10 (10)","355"},
+            {"Activities_Grade Level 10 (11)","356"},
+            {"Activities_Grade Level 10 (12)","357"},
+            {"Activities_Details 10","358"},
+            {"Activities_College Participation 10","359"},
+            {"progress p.5","360"},
+            {"Testing_Taken SAT","361"},
+            {"Testing_SAT Date 1","362"},
+            {"Testing_Taken ACT","363"},
+            {"Testing_ACT Date 1","364"},
+            {"Testing_TOEFL/IELTS","365"},
+            {"Testing_TOEFL/IELTS_Test Date","366"},
+            {"College_CEEB 1","367"},
+            {"College_Name 1","368"},
+            {"College _City 1","369"},
+            {"College_State 1","370"},
+            {"College _Country 1","371"},
+            {"College_Attended From 1","372"},
+            {"College_Attended To 1","373"},
+            {"College_Grad Date 1","374"},
+            {"College_Add College 2","375"},
+            {"College_CEEB 2","376"},
+            {"College_Name 2","377"},
+            {"College _City 2","378"},
+            {"College_State 2","379"},
+            {"College _Country 2","380"},
+            {"College_Attended From 2","381"},
+            {"College_Attended To 2","382"},
+            {"College_Grad Date 2","383"},
+            {"College_Add College 3","384"},
+            {"College_CEEB 3","385"},
+            {"College_Name 3","386"},
+            {"College _City 3","387"},
+            {"College_State 3","388"},
+            {"College _Country 3","389"},
+            {"College_Attended From 3","390"},
+            {"College_Attended To 3","391"},
+            {"College_Grad Date 3","392"},
+            {"College_Add College 4","393"},
+            {"College_CEEB 4","394"},
+            {"College_Name 4","395"},
+            {"College _City 4","396"},
+            {"College_State 4","397"},
+            {"College _Country 4","398"},
+            {"College_Attended From 4","399"},
+            {"College_Attended To 4","400"},
+            {"College_Grad Date 4","401"},
+            {"College_Add College 5","402"},
+            {"College_CEEB 5","403"},
+            {"College_Name 5","404"},
+            {"College _City 5","405"},
+            {"College_State 5","406"},
+            {"College _Country 5","407"},
+            {"College_Attended From 5","408"},
+            {"College_Attended To 5","409"},
+            {"College_Grad Date 5","410"},
+            {"Employment_Title 1","411"},
+            {"Employment_Employer 1","412"},
+            {"Employment_Country 1","413"},
+            {"Employment_Street Address 1","414"},
+            {"Employment_City 1","415"},
+            {"Employment_State 1","416"},
+            {"Employment_ZIP 1","417"},
+            {"Employment_Employed From 1","418"},
+            {"Employment_Employed Until 1","419"},
+            {"Employment_Hours 1","420"},
+            {"Employer_Add Employer 2","421"},
+            {"Employment_Title 2","422"},
+            {"Employment_Employer 2","423"},
+            {"Employment_Country 2","424"},
+            {"Employment_Street Address 2","425"},
+            {"Employment_City 2","426"},
+            {"Employment_State 2","427"},
+            {"Employment_ZIP 2","428"},
+            {"Employment_Employed From 2","429"},
+            {"Employment_Employed Until 2","430"},
+            {"Employment_Hours 2","431"},
+            {"Employer_Add Employer 3","432"},
+            {"Employment_Title 3","433"},
+            {"Employment_Employer 3","434"},
+            {"Employment_Country 3","435"},
+            {"Employment_Street Address 3","436"},
+            {"Employment_City 3","437"},
+            {"Employment_State 3","438"},
+            {"Employment_ZIP 3","439"},
+            {"Employment_Employed From 3","440"},
+            {"Employment_Employed Until 3","441"},
+            {"Employment_Hours 3","442"},
+            {"Personal Statement_Selected Topic","443"},
+            {"Personal Statement_Upload/Copy","444"},
+            {"Personal Statement_Upload","445"},
+            {"Personal Statement_Copy/Paste","446"},
+            {"Payment_Option","447"},
+            {"Payment_Waiver Type","448"},
+            {"Payment_ACT/SAT Waiver","449"},
+            {"Payment_Newberry Waiver Code","450"},
+            {"Payment Status","451"},
+            {"Misc_Influence to Apply","452"},
+            {"Misc_Visited Campus","453"},
+            {"Misc_Visit Campus_Date","454"},
+            {"Misc_Visit Group","455"},
+            {"Misc_Visit Group Name","456"},
+            {"Misc_Current Employee","457"},
+            {"Misc_Employee ID","458"},
+            {"Misc_Dependent/Spouse","459"},
+            {"Misc_Employee_First Name","460"},
+            {"Misc_Employee_Last Name","461"},
+            {"Misc_Suspended","462"},
+            {"Misc_Suspended Details","463"},
+            {"Misc_Felony","464"},
+            {"Misc_Felony Details","465"},
+            {"Signature","466"},
+            {"Signature Date","467"}
+
+        };
+
+        #endregion
+        
+        
+        
+        
+        
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+        }
+
+        /// <summary>
+        /// Violently kills the application.
+        /// </summary>
+        public static void CommitSuicide()
+        {
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
+        }
+
+        /// <summary>
+        /// Pause execution for ms milliseconds
+        /// </summary>
+        /// <param name="ms">milliseconds</param>
+        public static void Rest(int ms)
+        {
+            Application.DoEvents();
+            System.Threading.Thread.Sleep(ms);
+            Application.DoEvents();
+        }
+
+        public static void MessyRest(int ms)
+        {
+            for (int i = 1; i <= ms; i = i + 2) //double increment
+            {                                   //...
+                Application.DoEvents();         //because this is probably gonna take at least 1ms
+                System.Threading.Thread.Sleep(1);
+            }
+        }
+
+        /// <summary>
+        /// Connects to SQL db and executes specified query
+        /// </summary>
+        /// <param name="strQuery"></param>
+        public static void ExecuteQuery(string strSQL)
+        {
+            if (!DebugMode)
+            {
+                SqlConnection cn = new SqlConnection("Data Source=" + DatabaseHostname + ";Initial Catalog=" + DatabaseCatalog + ";User Id=" + DatabaseUsername + ";Password=" + DatabasePassword + ";");
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = strSQL;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = cn;
+                cn.Open();
+                cmd.ExecuteNonQuery();
+                cn.Close();
+            }
+            else
+            {
+                //We're testing, don't write to database
+                MessyRest(100);
+            }
+        }
+
+        /// <summary>
+        /// Gets next available Jenz ID Number
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNextSeqNumber()
+        {
+            SqlConnection cn = new SqlConnection("Data Source=" + DatabaseHostname + ";Initial Catalog=" + DatabaseCatalog + ";User Id=" + DatabaseUsername + ";Password=" + DatabasePassword + ";");
+            SqlCommand cmd = new SqlCommand("[adm].[GetNextSeqNumber]", cn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlParameter parm = new SqlParameter("@REF_ID", SqlDbType.VarChar);
+            parm.Size = 300;
+            parm.Value = "NAME_MASTER";
+            parm.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(parm);
+            SqlParameter parm2 = new SqlParameter("@NextSeqNum", SqlDbType.Int);
+            //parm2.Size = 50;
+            parm2.Direction = ParameterDirection.Output; // This is important!
+            cmd.Parameters.Add(parm2);
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            cn.Close();
+
+            return cmd.Parameters["@NextSeqNum"].Value.ToString();
+        }
+
+        /// <summary>
+        /// Gets index of the column based on column title
+        /// </summary>
+        /// <param name="searchString">Column title</param>
+        /// <returns>0-based index of column</returns>
+        public static int GetColumnIndexOf(string searchString)
+        {
+            for (int i = 0; i <= ColumnIndex.GetUpperBound(0); i++)
+            {
+                if (ColumnIndex[i, 0] == searchString)
+                {
+                    return int.Parse(ColumnIndex[i, 1]);
+                }
+            }
+            //if we got this far, there are no matches
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets name of column based on index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetColumnTitleOf(int index)
+        {
+            for (int i = 0; i <= ColumnIndex.GetUpperBound(0); i++)
+            {
+                if (ColumnIndex[i, 1] == index.ToString())
+                {
+                    return ColumnIndex[i, 0];
+                }
+            }
+            //if we got this far, there are no matches
+            return "Error";
+        }
+
+        /// <summary>
+        /// Pulls info from CSV file and stores it as list of string arrays
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static List<string[]> parseCSV(string path)
+        {
+            //
+            List<string[]> parsedData = new List<string[]>();
+
+            try
+            {
+                using (StreamReader readFile = new StreamReader(path))
+                {
+                    string line;
+                    string[] row;
+                    string pattern = ",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))";  //Should be commas that are not encapsulated in quotation marks
+                    Regex r = new Regex(pattern);
+                    while ((line = readFile.ReadLine()) != null)
+                    {
+                        row = r.Split(line);
+                        parsedData.Add(row);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                CommitSuicide();
+            }
+
+
+            return parsedData;
+        }
+
+        /// <summary>
+        /// Checks to see if header titles are what the program is expecting
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>True if first line is correct</returns>
+        public static Boolean CheckFirstLine(string path)
+        {
+            string ColumnContent = "";
+            int ColumnCount = 0;
+            List<string[]> parsedData = parseCSV(path);
+            string[] firstRow = parsedData[0];
+            foreach (string strColumn in firstRow)
+            {
+                ColumnContent = strColumn.TrimQuotes();
+                if (ColumnContent == GetColumnTitleOf(ColumnCount))
+                {
+                    //great
+                }
+                else
+                {
+                    //not so great
+                    return false;
+                }
+                ColumnCount++;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// For use in 'USER_NAME' column in DB
+        /// </summary>
+        /// <returns></returns>
+        public static string GetJobUsername()
+        {
+            return "Import from Fire Engine Red tool running as " + Environment.UserName;
+        }
+
+        public static string GetHSCodeFromName(string strHSName)
+        {
+            string theAnswer;
+            try
+            {
+                SqlConnection cn = new SqlConnection("Data Source=" + DatabaseHostname + ";Initial Catalog=" + DatabaseCatalog + ";User Id=" + DatabaseUsername + ";Password=" + DatabasePassword + ";");
+                string sqlQuery = "SELECT TOP 1000 n.[ID_NUM], n.[LAST_NAME] FROM [dbo].[NAME_MASTER] as n LEFT JOIN ";
+                sqlQuery += "[dbo].[ORG_MASTER] as o on n.[ID_NUM] = o.[ID_NUM] WHERE o.[ORG_TYPE] = 'HS' AND n.[LAST_NAME] ";
+                sqlQuery += "LIKE '%" + strHSName + "%'";
+                
+                SqlCommand cmd = new SqlCommand(sqlQuery, cn);
+
+                cn.Open();
+                theAnswer = cmd.ExecuteScalar().ToString();
+                cn.Close();
+
+                return theAnswer;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public static string WhicheverHasContent(string strA, string strB)
+        {
+            if (strA == "")
+            {
+                return strB;
+            }
+            else
+            {
+                return strA;
+            }
+        }
+    }
+
+
+    public static class Extensions
+    {
+        /// <summary>
+        /// Gets the last few characters of the string
+        /// </summary>
+        /// <param name="s">The string</param>
+        /// <param name="tail_length">Number of characters to get</param>
+        /// <returns></returns>
+        public static string GetLast(this string s, int tail_length)
+        {
+            if (tail_length >= s.Length) { return s; }
+            return s.Substring(s.Length - tail_length);
+        }
+
+        /// <summary>
+        /// Gets the first few characters of the string
+        /// </summary>
+        /// <param name="s">The string</param>
+        /// <param name="head_length">Number of characters to get</param>
+        /// <returns></returns>
+        public static string GetFirst(this string s, int head_length)
+        {
+            return s.Substring(0, Math.Min(s.Length, head_length));
+        }
+
+        /// <summary>
+        /// Removes all single and double quotes from the string
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string RemoveAllQuotes(this string s)
+        {
+            string theNewString;
+            theNewString = s.Replace("'", "");
+            theNewString = theNewString.Replace("\"", "");
+            return theNewString;
+        }
+
+        /// <summary>
+        /// Removes anything that isn't a-z, A-Z, or 0-9.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string RemoveNonAlphanumeric(this string s)
+        {
+            return Regex.Replace(s, @"[^\w\s]", string.Empty);
+        }
+
+        /// <summary>
+        /// Removes leading and trailing quotation marks
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string TrimQuotes(this string s)
+        {
+            string strNew = s;
+            if (strNew.StartsWith("\""))
+            {
+                strNew = strNew.Remove(0, 1);
+            }
+
+            if (strNew.EndsWith("\""))
+            {
+                strNew = strNew.Remove(strNew.Length - 1);
+            }
+
+            return strNew;
+        }
+
+        /// <summary>
+        /// Adds single 'quotes' to string with content. Replaces with NULL if there is no content
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string QuoteOrNull(this string s)
+        {
+            if (s == "")
+            {
+                return "NULL";
+            }
+            else
+            {
+                return "'" + s + "'";
+            }
+        }
+
+        /// <summary>
+        /// Formats a DateTime object for SQL Insert (yyyy-MM-dd HH:mm:ss)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static string ToSQLDatetime(this DateTime dt)
+        {
+            return dt.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        /// <summary>
+        /// Converts numbers to their ordinal equivalent
+        /// </summary>
+        /// <example>1 converts to 1st</example>
+        /// <param name="num">Integer number</param>
+        /// <returns>String containing ordinal representation of number</returns>
+        public static string Ordinal(this int num)
+        {
+            switch (num % 100)
+            {
+                case 11:
+                case 12:
+                case 13:
+                    return num.ToString() + "th";
+            }
+
+            switch (num % 10)
+            {
+                case 1:
+                    return num.ToString() + "st";
+                case 2:
+                    return num.ToString() + "nd";
+                case 3:
+                    return num.ToString() + "rd";
+                default:
+                    return num.ToString() + "th";
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Release\ImportFromFireEngineRed.exe.config
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Release\ImportFromFireEngineRed.exe
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\bin\Release\ImportFromFireEngineRed.pdb
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Release\ImportFromFireEngineRed.Form1.resources
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Release\ImportFromFireEngineRed.Properties.Resources.resources
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Release\ImportFromFireEngineRed.csproj.GenerateResource.Cache
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Release\ImportFromFireEngineRed.exe
+C:\dev\ImportFromFireEngineRed\ImportFromFireEngineRed\obj\Release\ImportFromFireEngineRed.pdb

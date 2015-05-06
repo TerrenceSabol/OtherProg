@@ -1,0 +1,288 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace DuplicateResolver
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            progressBar1.Hide();
+            progressBar1.Location = btnResolve.Location;
+            progressBar1.Size = btnResolve.Size;
+
+            Program.WriteLog("Program opened by " + Environment.UserName);
+        }
+
+        private void btnResolve_Click(object sender, System.EventArgs e)
+        {
+            int HowManyHolding = NumberOfHoldingRecords();
+            if (HowManyHolding > 0)
+            {
+                MessageBox.Show("Found " + HowManyHolding + " candidates in the holding records. Click OK to resolve duplicates.");
+
+                progressBar1.Show();
+                btnResolve.Hide();
+                ResolveDuplicates(HowManyHolding);
+                btnResolve.Show();
+                progressBar1.Hide();
+            }
+            else
+            {
+                MessageBox.Show("There are no candidates in the holding records!");
+            }
+        }
+
+        private void ResolveDuplicates(int HowManyToResolve)
+        {
+            progressBar1.Maximum = HowManyToResolve * 5; //5 steps per person
+            progressBar1.Value = 0;
+
+            //create query to get next person from holding tables
+            SqlConnection cn = new SqlConnection("Data Source=" + Program.DatabaseHostname + ";Initial Catalog=" + Program.DatabaseCatalog + ";User Id=" + Program.DatabaseUsername + ";Password=" + Program.DatabasePassword + ";");
+            string sqlQuery = "SELECT TOP 1 [ID_NUM] FROM [dbo].[NC_HOLDING_NAME_MASTER] ORDER BY [ID_NUM] ASC";
+            SqlCommand cmd = new SqlCommand(sqlQuery, cn);
+
+            //run it X many times
+            for (int i = 1; i <= HowManyToResolve; i++)
+            {
+                cn.Open();
+                ResolveDuplicate(Convert.ToInt32(cmd.ExecuteScalar()));
+                cn.Close();
+            }
+        }
+
+        private void ResolveDuplicate(int HoldingIDNumber)
+        {
+            Program.WriteLog("Attempting to resolve candidate with holding ID of " + HoldingIDNumber.ToString());
+            int ExistingJenzID = IsThisADuplicate(HoldingIDNumber);
+            if (ExistingJenzID == 0)
+            {
+                //Not a duplicate. Simply write to tables.
+                Program.WriteLog("Copying person with ID of " + HoldingIDNumber + " to Jenzabar tables.");
+                //TODO: Write to tables
+                
+            }
+            else
+            {
+                //is a duplicate. Resolve columns
+                Program.WriteLog("Resolving columns with holdingID = " + HoldingIDNumber + " and JenzID = " + ExistingJenzID + ".");
+                ResolveAllColumns(HoldingIDNumber, ExistingJenzID);
+                Program.WriteLog("Columns have been resolved.");
+            }
+
+            //Finally, delete them from holding tables.
+            Program.WriteLog("Deleting holding ID of " + HoldingIDNumber + ".");
+            //TODO: Delete from Holding
+        }
+
+        private void ResolveAllColumns(int HoldingID, int ExistingID)
+        {
+            CompareTables("NAME_MASTER", ExistingID, HoldingID);
+            progressBar1.Value++;
+            Program.MessyRest(1);
+
+            CompareTables("BIOGRAPH_MASTER", ExistingID, HoldingID);
+            progressBar1.Value++;
+            Program.MessyRest(1);
+
+            CompareTables("CANDIDACY", ExistingID, HoldingID);
+            progressBar1.Value++;
+            Program.MessyRest(1);
+
+            CompareTables("CANDIDATE", ExistingID, HoldingID);
+            progressBar1.Value++;
+            Program.MessyRest(1);
+
+            //TODO: Copy address master. Dupe entries are okay
+            progressBar1.Value++;
+            Program.MessyRest(1);
+        }
+
+        private void CompareTables(string TableName, int ExistingID, int IncomingID)
+        {
+            string ExistingTable = TableName;
+            string IncomingTable = "NC_HOLDING_" + TableName;
+            
+            SqlConnection cn = new SqlConnection("Data Source=" + Program.DatabaseHostname + ";Initial Catalog=" + Program.DatabaseCatalog + ";User Id=" + Program.DatabaseUsername + ";Password=" + Program.DatabasePassword + ";");
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader reader;
+
+            Program.WriteLog("Checking [" + ExistingTable + "] vs [" + IncomingTable +  "] tables...");
+
+            string sqlQuery = "SELECT [COLUMN_NAME] FROM [INFORMATION_SCHEMA].[COLUMNS] ";
+            sqlQuery += "WHERE [TABLE_NAME] = '" + IncomingTable + "'";
+            sqlQuery += "AND [COLUMN_NAME] NOT LIKE 'ID_NUM'";
+            sqlQuery += "AND [COLUMN_NAME] NOT LIKE 'USER_NAME'";
+            sqlQuery += "AND [COLUMN_NAME] NOT LIKE 'JOB_NAME'";
+            sqlQuery += "AND [COLUMN_NAME] NOT LIKE 'JOB_TIME'";
+            sqlQuery += "ORDER BY [ORDINAL_POSITION]";
+
+            cmd.CommandText = sqlQuery;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = cn;
+            cn.Open();
+            reader = cmd.ExecuteReader();
+
+            //pull data from reader
+            while (reader.HasRows)
+            {
+                while (reader.Read()) //cycle through columns
+                {
+                    string ColumnName = reader.GetValue(0).ToString();
+                    Program.WriteLog("Checking both [" + ColumnName + "] columns for data...");
+                    string ExistingColumnValue = GetResult(ExistingTable, ExistingID, ColumnName);
+                    string IncomingColumnValue = GetResult(IncomingTable, IncomingID, ColumnName);
+                    if (ExistingColumnValue == IncomingColumnValue)
+                    {
+                        //Then both entries match, there is no updating to be done
+                        Program.WriteLog("Columns match.");
+                    }
+                    else
+                    {
+                        //They don't match
+                        if (ExistingColumnValue == "")
+                        {
+                            Program.WriteLog("Incoming has data, existing does not. Writing new data to Jenz.");
+                            
+                            //ExecuteNonQuery("UPDATE [" + ExistingTable + "] SET [" + 
+                            //    ColumnName + "]='" + IncomingColumnValue + 
+                            //    "' WHERE [ID_NUM] = '" + ExistingID + "'");
+                            //TODO: ask vbforums a better way to do this.
+                            
+                        }
+                        else if (IncomingColumnValue == "")
+                        {
+                            Program.WriteLog("Incoming is blank, Jenz has existing data. Skipping column.");
+                            //don't do anything. Incoming is blank, but data exists in Jenz. Don't write null over existing data.
+                        }
+                        else
+                        {
+                            //neither are blank. 
+                            Program.WriteLog("Incoming has data, existing has data. Asking user...");
+                            //TODO: Ask user what to do.
+                        }
+                    }
+                }
+                reader.NextResult();
+            }
+
+            cn.Close();
+        }
+        
+
+        /// <summary>
+        /// Attempts to see if person in Holding table is a duplicate of existing person in Jenz system
+        /// </summary>
+        /// <param name="HoldingIDNumber"></param>
+        /// <returns>0 if not duplicate. Existing Jenz ID if duplicate.</returns>
+        private int IsThisADuplicate(int HoldingIDNumber)
+        {
+            Program.WriteLog("Checking to see if candidate with holding ID of " + HoldingIDNumber + " is a duplicate of an existing Jenzabar entry.");
+            int MatchingExistingID;
+
+            string HoldingSSN = GetResult("NC_HOLDING_BIOGRAPH_MASTER", HoldingIDNumber, "SSN");
+            string HoldingFirstName = GetResult("NC_HOLDING_NAME_MASTER", HoldingIDNumber, "FIRST_NAME");
+            string HoldingLastName = GetResult("NC_HOLDING_NAME_MASTER", HoldingIDNumber, "LAST_NAME");
+
+            if (HoldingSSN == "") //no SSN in holding table. Try other things.
+            {
+                //TODO: Check names for duplicates
+            }
+            else 
+            {
+                //Check if someone exists with this SSN
+                SqlConnection cn = new SqlConnection("Data Source=" + Program.DatabaseHostname + ";Initial Catalog=" + Program.DatabaseCatalog + ";User Id=" + Program.DatabaseUsername + ";Password=" + Program.DatabasePassword + ";");
+                string sqlQuery = "SELECT [ID_NUM] FROM [dbo].[BIOGRAPH_MASTER] WHERE [SSN] = '" + HoldingSSN + "'";
+                SqlCommand cmd = new SqlCommand(sqlQuery, cn);
+                cn.Open();
+                MatchingExistingID = Convert.ToInt32(cmd.ExecuteScalar());
+                cn.Close();
+                if (MatchingExistingID == 0)
+                {
+                    //no matches
+                }
+                else
+                {
+                    Program.WriteLog("This person matches existing Jenzabar ID = " + MatchingExistingID + ".");
+                    return MatchingExistingID;
+                }
+            }
+
+            //Does not appear to be a duplicate.
+            Program.WriteLog("Not a duplicate");
+            return 0;
+            
+        }
+
+        private string GetResult(string strTable, int IDNum, string strColumn)
+        {
+            try
+            {
+                string  theAnswer;
+                SqlConnection cn = new SqlConnection("Data Source=" + Program.DatabaseHostname + ";Initial Catalog=" + Program.DatabaseCatalog + ";User Id=" + Program.DatabaseUsername + ";Password=" + Program.DatabasePassword + ";");
+                string sqlQuery = "SELECT [" + strColumn + "] FROM [dbo].[" + strTable + "] WHERE [ID_NUM] = '" + IDNum + "'";
+
+                SqlCommand cmd = new SqlCommand(sqlQuery, cn);
+
+                cn.Open();
+                theAnswer = cmd.ExecuteScalar().ToString();
+                cn.Close();
+
+                return theAnswer;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private int NumberOfHoldingRecords()
+        {
+            try
+            {
+                int theAnswer;
+                SqlConnection cn = new SqlConnection("Data Source=" + Program.DatabaseHostname + ";Initial Catalog=" + Program.DatabaseCatalog + ";User Id=" + Program.DatabaseUsername + ";Password=" + Program.DatabasePassword + ";");
+                string sqlQuery = "SELECT COUNT(*) FROM [dbo].[NC_HOLDING_NAME_MASTER]";
+
+                SqlCommand cmd = new SqlCommand(sqlQuery, cn);
+
+                cn.Open();
+                theAnswer = Convert.ToInt32(cmd.ExecuteScalar());
+                cn.Close();
+
+                return theAnswer;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private void ExecuteNonQuery(string strSQL)
+        {
+            Program.WriteLog("Executing the following SQL Statement.\r\n" + strSQL);
+            SqlConnection conn = new SqlConnection("Data Source=" + Program.DatabaseHostname + ";Initial Catalog=" + Program.DatabaseCatalog + ";User Id=" + Program.DatabaseUsername + ";Password=" + Program.DatabasePassword + ";");
+            SqlCommand commd = new SqlCommand();
+            commd.CommandText = strSQL;
+            commd.CommandType = CommandType.Text;
+            commd.Connection = conn;
+            conn.Open();
+            commd.ExecuteNonQuery();
+            conn.Close();
+        }
+    }
+}
