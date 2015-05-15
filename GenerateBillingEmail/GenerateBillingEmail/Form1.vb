@@ -178,7 +178,7 @@ Public Class Form1
         ListBox2.Items.Add(theitem.Substring(i))
         Label2.Text = " "
     End Sub
-    
+
 
 
     Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
@@ -476,7 +476,7 @@ Public Class Form1
             oODBCConnection.Open()
 
 
-            strSQL = "Select a.ID_NUM, sum(a.trans_amt)   , last_name +   ', ' +  first_name ,  email_address   from trans_hist a left join name_master nm on a.id_num=nm.id_num   where SUBSID_CDE='AR'   and                         TRANS_DTE"
+            strSQL = "Select a.ID_NUM, sum(a.trans_amt)   , last_name +   ', ' +  first_name ,  email_address   from trans_hist a left join name_master nm on a.id_num=nm.id_num   where SUBSID_CDE='AR'   and                         a.job_time"
             strSQL += " between '" & TextBox6.Text & "' and '" & TextBox7.Text & "'   group by a.id_num,last_name +   ', ' +  first_name  ,  email_address having sum(trans_amt) < ( select ctlfld1 from NC_CONTROL_INFO where ctlname='BILLING_DEBIT_AMOUNT')"
             strSQL += " OR sum(trans_amt) > ( select ctlfld1 from NC_CONTROL_INFO where ctlname='BILLING_CREDIT_AMOUNT')"
             strSQL += "  order by last_name +   ', ' +  first_name,a.id_num"
