@@ -1,0 +1,11 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\GenerateBillingEmail\bin\Debug\GenerateBillingEmail.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\bin\Debug\GenerateBillingEmail.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\bin\Debug\GenerateBillingEmail.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\bin\Debug\GenerateBillingEmail.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\bin\Debug\GenerateBillingEmail.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\obj\Debug\GenerateBillingEmail.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\obj\Debug\GenerateBillingEmail.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\obj\Debug\GenerateBillingEmail.vbproj.GenerateResource.Cache
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\obj\Debug\GenerateBillingEmail.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\obj\Debug\GenerateBillingEmail.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\GenerateBillingEmail\GenerateBillingEmail\obj\Debug\GenerateBillingEmail.pdb
