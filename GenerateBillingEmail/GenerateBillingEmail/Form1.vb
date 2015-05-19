@@ -3,6 +3,7 @@ Imports System.Data.SqlClient
 Imports System.Web
 Imports System.Net.Mail
 Imports System.IO
+Imports System.Text.RegularExpressions
 
 
 Public Class Form1
@@ -145,28 +146,51 @@ Public Class Form1
         For i = 0 To ListBox2.Items.Count - 1
             'theemail = Getemailaddress(theid)
             theemail = Trim(GetEmail(ListBox2.Items(i).ToString))
-            theid = Getid(theemail)
-            theamount = CDec(Trim(GetAmount(ListBox2.Items(i).ToString)))
-            subjectline = TextBox5.Text
-            'emailsent = SendMail(subjectline, "tsabol@n3t.com", "Y)
-            Dim themessage As String
-            If CheckBox4.Checked = True Then
-                parsemessage = holdparsemessage
-                parsemessage = parsemessage & "<br><h4>" & theemail & " Do not reply to this message via email</h4>"
-                theemail = TextBox8.Text
-            End If
-            themessage = "<HTML><BODY>" & parsemessage & "</BODY></HTML>"
+            Dim validemail As Boolean
+            validemail = validateEmail(theemail)
+            If validemail = True Then
 
-            emailsent = SendMail(TextBox4.Text, TextBox3.Text, theemail, theemail, subjectline, themessage)
-            If emailsent = "Good" Then
-                sentemails = sentemails + 1
-                updategoodemail(theid, theemail, theamount)
+                theid = Getid(theemail)
+                theamount = CDec(Trim(GetAmount(ListBox2.Items(i).ToString)))
+
+
+                subjectline = TextBox5.Text
+                'emailsent = SendMail(subjectline, "tsabol@n3t.com", "Y)
+                Dim themessage As String
+                If CheckBox4.Checked = True Then
+                    parsemessage = holdparsemessage
+                    parsemessage = parsemessage & "<br><h4>" & theemail & " Do not reply to this message via email</h4>"
+                    theemail = TextBox8.Text
+                End If
+                themessage = "<HTML><BODY>" & parsemessage & "</BODY></HTML>"
+
+                emailsent = SendMail(TextBox4.Text, TextBox3.Text, theemail, theemail, subjectline, themessage)
+                If emailsent = "Good" Then
+                    sentemails = sentemails + 1
+                    updategoodemail(theid, theemail, theamount)
+                Else
+                    updateerroremail(theid, theemail, theamount)
+                End If
             Else
-                updateerroremail(theid, theemail, theamount)
+                updateerroremail("0", theemail, 0.0)
             End If
+
+
         Next i
         Label2.Text = sentemails & " emails sent"
     End Sub
+    Public Function validateEmail(emailAddress) As Boolean
+        ' Dim email As New Regex("^(?<user>[^@]+)@(?<host>.+)$")
+        If InStr(emailAddress, "'") > 0 Then
+            Return False
+        End If
+        Dim email As New Regex("([\w-+]+(?:\.[\w-+]+)*@(?:[\w-]+\.)+[a-zA-Z]{2,7})")
+        If email.IsMatch(emailAddress) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 
     Private Sub ListBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ListBox1.SelectedIndexChanged
         Dim theitem As String
@@ -207,6 +231,7 @@ Public Class Form1
         ListBox1.Items.Add("000000" & ".....................*" & 0.0 & "~....................+" & "Manual" & ".....................|" & TextBox2.Text)
 
     End Sub
+     
     Public Function updateerroremail(id_num As String, stremail As String, balance As Decimal) As Boolean
         Dim strSQL As String
         Dim soSQLConnection As SqlConnection
@@ -476,9 +501,9 @@ Public Class Form1
             oODBCConnection.Open()
 
 
-            strSQL = "Select a.ID_NUM, sum(a.trans_amt)   , last_name +   ', ' +  first_name ,  email_address   from trans_hist a left join name_master nm on a.id_num=nm.id_num   where SUBSID_CDE='AR'   and                         a.job_time"
-            strSQL += " between '" & TextBox6.Text & "' and '" & TextBox7.Text & "'   group by a.id_num,last_name +   ', ' +  first_name  ,  email_address having sum(trans_amt) < ( select ctlfld1 from NC_CONTROL_INFO where ctlname='BILLING_DEBIT_AMOUNT')"
-            strSQL += " OR sum(trans_amt) > ( select ctlfld1 from NC_CONTROL_INFO where ctlname='BILLING_CREDIT_AMOUNT')"
+            strSQL = "Select a.ID_NUM, sum(a.trans_amt)   , last_name +   ', ' +  first_name ,  email_address   from trans_hist a left join name_master nm on a.id_num=nm.id_num   where OFFSET_FLAG='R'     and                        a.job_time"
+            strSQL += " between '" & TextBox6.Text & "' and '" & TextBox7.Text & "'   group by a.id_num,last_name +   ', ' +  first_name  ,  email_address having sum(trans_amt) > ( select ctlfld1 from NC_CONTROL_INFO where ctlname='BILLING_DEBIT_AMOUNT')"
+            strSQL += " OR sum(trans_amt) < ( select ctlfld1 from NC_CONTROL_INFO where ctlname='BILLING_CREDIT_AMOUNT')"
             strSQL += "  order by last_name +   ', ' +  first_name,a.id_num"
 
 

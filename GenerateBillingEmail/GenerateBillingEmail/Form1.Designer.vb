@@ -339,7 +339,7 @@ Partial Class Form1
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TextBox1)
         Me.Name = "Form1"
-        Me.Text = "Generate Billing Emails"
+        Me.Text = "Generate Billing Emails v 1.1"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
