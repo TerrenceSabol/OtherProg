@@ -1,0 +1,20 @@
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.exe.config
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.pdb
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.Form1.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.Resources.resources
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.vbproj.GenerateResource.Cache
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.exe
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.xml
+C:\Users\terry.sabol\AppData\Local\Temporary Projects\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.exe.config
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.exe
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.pdb
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\bin\Debug\ResetAdvisorGen.xml
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.Form1.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.Resources.resources
+\\ncfs2\home\OIT\Terry.Sabol\Visual Studio 2012\Projects\ResetAdvisorGen\ResetAdvisorGen\obj\Debug\ResetAdvisorGen.vbproj.GenerateResource.Cache
